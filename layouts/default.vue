@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { User, Home, Timer, MapPin } from 'lucide-vue-next'
+import {User, Home, Timer, Calendar} from 'lucide-vue-next'
 </script>
 
 <template>
@@ -17,24 +17,36 @@ import { User, Home, Timer, MapPin } from 'lucide-vue-next'
     </div>
   </header>
   <main>
-    <div class="py-8">
+    <div class="pt-8 pb-24">
       <div class="container">
         <slot/>
       </div>
     </div>
     <div class="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t border-border">
-      <div class="grid grid-cols-3 h-full max-w-lg mx-auto font-medium text-sm">
-        <NuxtLink to="/dashboard" class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50" activeClass="!opacity-100">
+      <div class="grid grid-cols-3 h-full max-w-lg mx-auto font-medium text-xs">
+        <NuxtLink
+            to="/dashboard"
+            class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
+            activeClass="!opacity-100"
+        >
           <Home class="size-5"/>
           Home
         </NuxtLink>
-        <NuxtLink to="/timer" class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50" activeClass="opacity-100">
+        <NuxtLink
+            to="/timer"
+            class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
+            activeClass="!opacity-100"
+        >
           <Timer class="size-5"/>
           Stopwatch
         </NuxtLink>
-        <NuxtLink to="/tracks" class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50" activeClass="opacity-100">
-          <MapPin class="size-5"/>
-          Crossbanen
+        <NuxtLink
+            to="/tracks"
+            class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
+            activeClass="!opacity-100"
+        >
+          <Calendar class="size-5"/>
+          Sessies
         </NuxtLink>
       </div>
     </div>

@@ -1,7 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt'],
+  css: [
+    '~/assets/css/main.css',
+    '~/assets/css/tailwind.css',
+  ],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    'shadcn-nuxt',
+    '@nuxtjs/supabase',
+  ],
   shadcn: {
     componentDir: './components/ui'
   }
