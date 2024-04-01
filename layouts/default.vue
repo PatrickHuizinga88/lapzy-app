@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import {User, Home, Timer, Calendar} from 'lucide-vue-next'
+
+const currentPath = computed(() => {
+  return useRoute().path
+})
 </script>
 
 <template>
-  <header class="sticky top-0 left-0 bg-background border-b border-border py-4">
+  <NuxtLoadingIndicator color="#FF5C00" />
+  <header class="sticky top-0 left-0 h-[72px] bg-background border-b border-border py-4">
     <div class="container">
       <div class="flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center">
@@ -16,9 +21,9 @@ import {User, Home, Timer, Calendar} from 'lucide-vue-next'
       </div>
     </div>
   </header>
-  <main>
-    <div class="pt-8 pb-24">
-      <div class="container">
+  <main class="h-[calc(100vh-72px)] overflow-auto">
+    <div class="h-full pt-8 pb-24">
+      <div class="h-full container">
         <slot/>
       </div>
     </div>
@@ -32,14 +37,12 @@ import {User, Home, Timer, Calendar} from 'lucide-vue-next'
           <Home class="size-5"/>
           Home
         </NuxtLink>
-        <NuxtLink
-            to="/timer"
-            class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
-            activeClass="!opacity-100"
-        >
-          <Timer class="size-5"/>
-          Stopwatch
-        </NuxtLink>
+        <SessionDialog>
+          <button :class="[{'!opacity-100' : currentPath === '/timer'}, 'inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50']" :disabled="currentPath === '/timer'">
+            <Timer class="size-5"/>
+            Stopwatch
+          </button>
+        </SessionDialog>
         <NuxtLink
             to="/sessions"
             class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"

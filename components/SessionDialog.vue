@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Play, Star} from "lucide-vue-next";
+import {Star} from "lucide-vue-next";
 
 const featuredTracks = [
   {
@@ -38,6 +38,7 @@ const conditions = [
 const selectedTrack = ref<number | undefined>(undefined)
 const selectedCondition = ref('MEDIUM')
 const error = ref('')
+const open = ref(false)
 
 const handleSubmit = () => {
   if (selectedTrack.value === undefined) {
@@ -52,16 +53,18 @@ const handleSubmit = () => {
       condition: selectedCondition.value,
     }
   })
+
+  open.value = false
+  selectedTrack.value = undefined
+  selectedCondition.value = 'MEDIUM'
+  error.value = ''
 }
 </script>
 
 <template>
-  <Dialog>
+  <Dialog v-model:open="open">
     <DialogTrigger as-child>
-      <Button size="xl" class="w-full">
-        Start nieuwe sessie
-        <Play class="size-5 ml-2.5"/>
-      </Button>
+      <slot />
     </DialogTrigger>
     <DialogContent>
       <DialogTitle>
@@ -88,7 +91,7 @@ const handleSubmit = () => {
             <div v-for="condition in conditions">
               <input type="radio" :id="condition.value" name="condition" v-model="selectedCondition" :value="condition.value" class="hidden peer" />
               <Label
-                  for="condition"
+                  :for="condition.value"
                   class="inline-flex items-center justify-center w-full px-4 py-3 bg-background border border-input rounded-lg cursor-pointer peer-checked:border-primary peer-checked:text-primary peer-checked:bg-primary/10 hover:bg-muted"
               >
                 {{ condition.name }}

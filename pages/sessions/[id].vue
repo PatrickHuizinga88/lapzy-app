@@ -2,7 +2,7 @@
 const { id } = useRoute().params
 const supabase = useSupabaseClient()
 
-const {data: session, pending} = useAsyncData('session', async () => {
+const {data: session, pending: pendingSession} = await useAsyncData('session', async () => {
   const { data, error } = await supabase
       .from('sessions')
       .select('*')
@@ -14,7 +14,7 @@ const {data: session, pending} = useAsyncData('session', async () => {
 </script>
 
 <template>
-  <h1>Je sessie in {{ session?.track_id }}</h1>
+  <h1 class="text-center text-lg">Je sessie in <span class="block text-3xl font-semibold mt-2">{{ session?.track_id }}</span></h1>
 </template>
 
 <style scoped>
