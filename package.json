@@ -25,6 +25,8 @@
   "devDependencies": {
     "@nuxtjs/supabase": "^1.2.0",
     "@nuxtjs/tailwindcss": "^6.11.4",
+    "dayjs": "^1.11.10",
+    "dayjs-nuxt": "^2.1.9",
     "shadcn-nuxt": "^0.10.2",
     "typescript": "^5.4.3"
   }

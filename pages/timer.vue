@@ -9,15 +9,16 @@ interface Laps {
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-onMounted(() => {
-  const { track, condition } = useRoute().query
+const { track_id, condition } = useRoute().query
 
-  if (track) trackId.value = parseInt(track as string)
-  if (condition) trackCondition.value = condition
+const { data: track, pending: pendingTrack } = await useAsyncData('track', async () => {
+  if (!track_id) return
+  const { data } = await supabase.from('tracks')
+      .select('name')
+      .eq('id', track_id)
+      .single()
+  return data
 })
-
-const trackId = ref<number | undefined>(undefined)
-const trackCondition = ref<string | undefined>(undefined)
 
 let laps: Laps[] = []
 
@@ -58,6 +59,11 @@ const setLap = () => {
     sec: '00',
     ms: '00',
   }
+}
+
+const resume = () => {
+  timerInterval.value = setInterval(clockRunning, 50)
+  timerRunning.value = true
 }
 
 const stop = () => {
@@ -107,24 +113,33 @@ const discardSession = () => {
 }
 
 const saveSession = async () => {
+  if (!user.value) {
+    navigateTo('/login')
+    return
+  }
+
   try {
     const { error } = await supabase.from('sessions').insert({
-      track_id: trackId.value,
-      user_id: user.value?.id,
-      duration: time.value.total,
+      track_id: track_id,
+      user_id: user.value.id,
+      condition: condition,
+      duration: time.value.total
     })
     if (error) throw error
+    alert('Sessie opgeslagen!')
     navigateTo('/sessions')
   } catch (error) {
-    alert(error.message)
+    console.error(error)
+    alert('Sessie kan niet worden opgeslagen.')
   }
 }
 </script>
 
 <template>
   <div class="flex flex-col h-full">
-    <section class="flex flex-col items-center justify-center text-center h-32">
-      <h1 class="text-2xl font-medium mb-1">MCO Oirschot</h1>
+    <section v-if="track" class="flex flex-col items-center justify-center text-center h-32 space-y-1">
+      <h1 v-if="!pendingTrack" class="text-2xl font-medium">{{ track?.name }}</h1>
+      <Skeleton v-if="pendingTrack" class="h-8 w-40" />
       <div class="flex items-center justify-center gap-x-2 text-muted-foreground text-lg">
         <Trophy class="size-5"/>
         01:34.24
@@ -176,7 +191,7 @@ const saveSession = async () => {
 <!--              <Button size="lg" @click="saveSession">Opslaan</Button>-->
 <!--            </DialogFooter>-->
 <!--          </Dialog>-->
-          <Button size="xl" @click="start">Hervatten</Button>
+          <Button size="lg" @click="resume">Hervatten</Button>
         </template>
       </div>
     </section>

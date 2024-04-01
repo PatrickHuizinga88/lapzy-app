@@ -16,6 +16,7 @@ module.exports = {
     },
     fontFamily: {
       sans: ["Inter", "sans-serif"],
+      logo: ["Tomorrow", "sans-serif"],
     },
     extend: {
       colors: {

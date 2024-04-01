@@ -6,10 +6,10 @@ import {User, Home, Timer, Calendar} from 'lucide-vue-next'
   <header class="sticky top-0 left-0 bg-background border-b border-border py-4">
     <div class="container">
       <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <img src="../assets/images/logo.svg" alt="Logo" class="h-6"/>
-          <span class="font-bold text-2xl italic">PH88</span>
-        </div>
+        <NuxtLink to="/" class="flex items-center">
+          <img src="../assets/images/logo.svg" alt="Logo" class="h-6 mr-1"/>
+          <div class="font-bold font-logo text-2xl italic">LAP<span class="text-muted-foreground">ZY</span></div>
+        </NuxtLink>
         <Button variant="ghost" size="icon" class="-mr-2.5">
           <User class="size-5"/>
         </Button>
@@ -25,7 +25,7 @@ import {User, Home, Timer, Calendar} from 'lucide-vue-next'
     <div class="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t border-border">
       <div class="grid grid-cols-3 h-full max-w-lg mx-auto font-medium text-xs">
         <NuxtLink
-            to="/dashboard"
+            to="/"
             class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
             activeClass="!opacity-100"
         >
@@ -41,7 +41,7 @@ import {User, Home, Timer, Calendar} from 'lucide-vue-next'
           Stopwatch
         </NuxtLink>
         <NuxtLink
-            to="/tracks"
+            to="/sessions"
             class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
             activeClass="!opacity-100"
         >

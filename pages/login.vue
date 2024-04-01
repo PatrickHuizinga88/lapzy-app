@@ -23,7 +23,7 @@ const signIn = async () => {
       password: form.password
     })
     if (error) throw error
-    navigateTo('/dashboard')
+    navigateTo('/')
   } catch (error) {
     errorMessage.value = 'Er ging iets fout. Probeer het later opnieuw.'
   } finally {
