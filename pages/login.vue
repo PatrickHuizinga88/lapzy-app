@@ -9,7 +9,7 @@ definePageMeta({
 const supabase = useSupabaseClient()
 
 const form = reactive({
-  email: 'patrickhuizinga44@gmail.com',
+  email: '',
   password: ''
 })
 const errorMessage = ref<string>('')
