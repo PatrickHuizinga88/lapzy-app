@@ -33,9 +33,10 @@ const signIn = async () => {
 </script>
 
 <template>
-  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm text-center">
     <img src="~/assets/images/logo.svg" alt="Logo" class="mx-auto h-12 w-auto">
-    <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">Inloggen op je account</h2>
+    <h2 class="mt-10 text-3xl font-bold leading-9 tracking-tight mb-2">Welkom bij Lapzy</h2>
+    <p class="text-muted-foreground">Jouw MX performance platform</p>
   </div>
 
   <div class="mt-10 sm:mx-auto w-full sm:max-w-[480px]">
@@ -56,9 +57,9 @@ const signIn = async () => {
         <div>
           <div class="flex items-center justify-between">
             <Label for="password">Wachtwoord</Label>
-            <Button variant="link" size="sm" class="h-auto p-0" as-child>
-              <NuxtLink to="#">Wachtwoord vergeten?</NuxtLink>
-            </Button>
+<!--            <Button variant="link" size="sm" class="h-auto p-0" as-child>-->
+<!--              <NuxtLink to="#">Wachtwoord vergeten?</NuxtLink>-->
+<!--            </Button>-->
           </div>
           <div class="mt-2">
             <Input

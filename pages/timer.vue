@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import {Trophy} from 'lucide-vue-next'
+import type {Database} from "~/types/supabase";
 
 interface Lap {
   time: string,
   duration: string
 }
 
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 
 const { track_id, condition } = useRoute().query
@@ -118,7 +119,7 @@ const isBestLap = (lapTime: string) => {
 
 const discardSession = () => {
   reset()
-  laps = []
+  laps.value = []
 }
 
 const saveSession = async () => {
@@ -128,19 +129,28 @@ const saveSession = async () => {
   }
 
   try {
-    const { error } = await supabase.from('sessions').insert({
-      track_id: track_id,
-      user_id: user.value.id,
-      condition: condition,
-      duration: totalTime.value,
-    })
-    if (error) throw error
+    const session = await insertSession()
+    await supabase.from('lap_times').insert(laps.value.map(lap => ({
+      session_id: session.id,
+      time: lap.time,
+    })))
     alert('Sessie opgeslagen!')
     navigateTo('/sessions')
   } catch (error) {
     console.error(error)
     alert('Sessie kan niet worden opgeslagen.')
   }
+}
+
+const insertSession = async () => {
+  if (!track_id) return
+  const { data } = await supabase.from('sessions').insert({
+    track_id: parseInt(track_id),
+    user_id: user.value.id,
+    condition: condition,
+    duration: totalTime.value,
+  }).single()
+  return data
 }
 </script>
 

@@ -1,23 +1,87 @@
 <script setup lang="ts">
-import {User, Home, Timer, Calendar} from 'lucide-vue-next'
+import {User, Home, Timer, Calendar, LogOut} from 'lucide-vue-next'
+import type {Database} from "~/types/supabase";
+
+const supabase = useSupabaseClient<Database>()
+const user = useSupabaseUser()
+
+const { data: profile } = await useAsyncData('profile', async () => {
+  if (!user.value) {
+    navigateTo('/login')
+    return
+  }
+
+  try {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.value.id)
+        .single()
+    if (error) throw error
+
+    return data
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+const initials = computed(() => {
+  if (!profile.value || !profile.value.first_name || !profile.value.last_name) return
+  return profile.value.first_name.charAt(0) + profile.value.last_name.charAt(0)
+})
 
 const currentPath = computed(() => {
   return useRoute().path
 })
+
+const logOut = async () => {
+  await supabase.auth.signOut()
+  navigateTo('/login')
+}
+
 </script>
 
 <template>
-  <NuxtLoadingIndicator color="#FF5C00" />
+  <NuxtLoadingIndicator :color="`hsl(${profile?.theme})`" />
+  <ClientOnly>
+    <ThemeProvider :theme="profile?.theme" />
+  </ClientOnly>
   <header class="sticky top-0 left-0 h-[72px] bg-background border-b border-border py-4">
     <div class="container">
       <div class="flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center">
-          <img src="../assets/images/logo.svg" alt="Logo" class="h-6 mr-1"/>
-          <div class="font-bold font-logo text-2xl italic">LAP<span class="text-muted-foreground">ZY</span></div>
+          <ClientOnly>
+            <Logo />
+            <template #fallback class="h-6 w-6 mr-1 bg-primary rounded-full">
+              <img src="../assets/images/logo.svg" alt="Logo" class="h-6 mr-1"/>
+            </template>
+          </ClientOnly>
+          <div class="font-bold font-logo text-2xl italic">
+            <template v-if="initials && profile?.rider_number">
+              {{ initials }}<span class="text-muted-foreground">{{ profile?.rider_number }}</span>
+            </template>
+            <template v-else>LAP<span class="text-muted-foreground">ZY</span></template>
+          </div>
         </NuxtLink>
-        <Button variant="ghost" size="icon" class="-mr-2.5">
-          <User class="size-5"/>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button variant="ghost" size="icon" class="-mr-2.5">
+              <User class="size-5"/>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent :align-offset="10">
+            <DropdownMenuItem as-child>
+              <NuxtLink to="/profile">
+                <User class="mr-2 size-4" />
+                Mijn profiel
+              </NuxtLink>
+            </DropdownMenuItem>
+            <DropdownMenuItem @click="logOut">
+              <LogOut class="mr-2 size-4" />
+              Uitloggen
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   </header>

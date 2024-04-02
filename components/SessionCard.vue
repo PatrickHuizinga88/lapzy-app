@@ -7,7 +7,7 @@ const props = defineProps<{
 
 const supabase = useSupabaseClient()
 
-const {data: track, pending: pending} = await useAsyncData('track', async () => {
+const {data: track} = await useAsyncData('track', async () => {
   const { data, error } = await supabase.from('tracks')
       .select('name')
       .eq('id', props.session.track_id)
@@ -24,6 +24,6 @@ const {data: track, pending: pending} = await useAsyncData('track', async () => 
       <div class="font-medium">{{ track?.name || session.track_id  }}</div>
       <div class="text-sm text-muted-foreground">{{ $dayjs(session.created_at).format('DD-MM-YYYY') }}</div>
     </div>
-    <div class="text-lg font-medium">{{ session.duration }}</div>
+    <div class="text-lg font-medium">{{ session.duration || '-' }}</div>
   </NuxtLink>
 </template>

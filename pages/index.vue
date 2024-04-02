@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import StatCard from "~/components/StatCard.vue";
+import type { Database } from "~/types/supabase";
 import { Play } from 'lucide-vue-next'
 
 const user = useSupabaseUser()
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
 
 const {data: recentSessions, pending: pendingSessions} = useAsyncData('sessions', async () => {
   if (!user.value) {
@@ -18,11 +19,27 @@ const {data: recentSessions, pending: pendingSessions} = useAsyncData('sessions'
       .limit(3)
   return data
 })
+
+const {data: profile} = await useAsyncData('profile', async () => {
+  if (!user.value) {
+    navigateTo('/login')
+    return
+  }
+
+  const {data, error} = await supabase.from('profiles')
+      .select('*')
+      .eq('id', user.value.id)
+      .single()
+  if (error) throw error
+  return data
+})
 </script>
 
 <template>
   <div class="space-y-6">
-    <h1 class="text-2xl sm:text-3xl font-semibold">Welkom terug, Patrick!</h1>
+    <h1 class="text-2xl sm:text-3xl font-semibold">
+      Welkom terug<template v-if="profile?.first_name">, {{profile.first_name}}</template>!
+    </h1>
 
 <!--    <section>-->
 <!--      <h2 class="font-semibold mb-2">Statistieken</h2>-->
