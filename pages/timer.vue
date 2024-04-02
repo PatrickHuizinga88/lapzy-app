@@ -129,11 +129,21 @@ const saveSession = async () => {
   }
 
   try {
-    const session = await insertSession()
-    await supabase.from('lap_times').insert(laps.value.map(lap => ({
+    const { data: session, error: sessionError } = await supabase.from('sessions').insert({
+      track_id: parseInt(track_id),
+      user_id: user.value.id,
+      condition: condition,
+    }).select().single()
+    if (sessionError) throw sessionError
+
+    console.log(session)
+
+    const { error: lapsError } = await supabase.from('lap_times').insert(laps.value.map(lap => ({
       session_id: session.id,
       time: lap.time,
     })))
+    if (lapsError) throw lapsError
+
     alert('Sessie opgeslagen!')
     navigateTo('/sessions')
   } catch (error) {
@@ -142,16 +152,6 @@ const saveSession = async () => {
   }
 }
 
-const insertSession = async () => {
-  if (!track_id) return
-  const { data } = await supabase.from('sessions').insert({
-    track_id: parseInt(track_id),
-    user_id: user.value.id,
-    condition: condition,
-    duration: totalTime.value,
-  }).single()
-  return data
-}
 </script>
 
 <template>
