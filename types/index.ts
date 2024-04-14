@@ -12,7 +12,7 @@ export interface Track {
   location?: string
   lon?: string
   lat?: string
-  created_at: string
+  created_at?: string
 }
 
 export interface Lap {

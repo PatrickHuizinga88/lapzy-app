@@ -1,24 +1,36 @@
 <script setup lang="ts">
 import {Star} from "lucide-vue-next";
+import type {Database} from "~/types/supabase";
+import type {Track} from "~/types";
+
+const supabase = useSupabaseClient<Database>()
 
 const featuredTracks = [
   {
     id: 1,
     name: "MCO Oirschot",
+    location: "Oirschot"
   },
   {
     id: 2,
     name: "MAC Budel",
-  },
-  {
-    id: 3,
-    name: "SRMV Berghem",
+    location: "Budel"
   },
   {
     id: 4,
     name: "De Landsard",
+    location: "Veldhoven"
   },
 ]
+
+const { data: tracks } = await useAsyncData('tracks', async () => {
+  const { data, error } = await supabase
+      .from('tracks')
+      .select('id, name, location')
+      .order('name', {ascending: true})
+  if (error) throw error
+  return data.filter(track => !featuredTracks.some(featuredTrack => featuredTrack.id === track.id))
+})
 
 const conditions = [
   {
@@ -73,16 +85,36 @@ const handleSubmit = () => {
 
       <form class="space-y-6" @submit.prevent="handleSubmit">
         <div class="flex flex-col gap-y-2">
-          <div v-for="track in featuredTracks">
-            <input type="radio" :id="track.id.toString()" name="selected-track" v-model="selectedTrack" :value="track.id" class="hidden peer" />
-            <label
-                :for="track.id.toString()"
-                class="inline-flex items-center justify-between w-full px-4 py-4 bg-background border border-input rounded-lg cursor-pointer peer-checked:border-primary peer-checked:text-primary peer-checked:bg-primary/10 hover:bg-muted"
-            >
-              {{ track.name }}
-              <Star class="size-5 text-yellow-400"/>
-            </label>
-          </div>
+<!--          <div v-for="track in featuredTracks">-->
+<!--            <input type="radio" :id="track.id.toString()" name="selected-track" v-model="selectedTrack" :value="track.id" class="hidden peer" />-->
+<!--            <label-->
+<!--                :for="track.id.toString()"-->
+<!--                class="inline-flex items-center justify-between w-full px-4 py-2 bg-background border border-input rounded-lg cursor-pointer peer-checked:border-primary peer-checked:text-primary peer-checked:bg-primary/10 hover:bg-muted"-->
+<!--            >-->
+<!--              <div class="flex flex-col font-medium">-->
+<!--                {{ track.name }}-->
+<!--                <span class="text-sm opacity-60 font-normal">{{ track.location }}</span>-->
+<!--              </div>-->
+
+<!--              <Star class="size-5 text-yellow-400"/>-->
+<!--            </label>-->
+<!--          </div>-->
+
+          <Select v-if="tracks" v-model="selectedTrack">
+            <SelectTrigger>
+              <SelectValue placeholder="Selecteer een baan" />
+            </SelectTrigger>
+            <SelectContent>
+<!--              <SelectGroup>-->
+<!--                <SelectLabel>Uitgelichte banen</SelectLabel>-->
+<!--                <SelectItem v-for="track in tracks" :value="track.id.toString()">{{track.name}} <span v-if="track.location" class="text-muted-foreground">- {{ track.location }}</span></SelectItem>-->
+<!--              </SelectGroup>-->
+<!--              <SelectGroup>-->
+<!--                <SelectLabel>Andere banen</SelectLabel>-->
+                <SelectItem v-for="track in tracks" :value="track.id.toString()">{{track.name}} <span v-if="track.location" class="text-muted-foreground">- {{ track.location }}</span></SelectItem>
+<!--              </SelectGroup>-->
+            </SelectContent>
+          </Select>
         </div>
 
         <div>

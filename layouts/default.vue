@@ -108,7 +108,7 @@ const leave = () => {
       </div>
     </div>
   </header>
-  <main class="h-[calc(100vh-72px)] overflow-auto">
+  <main class="h-[calc(100svh-72px)] overflow-auto">
     <div class="h-full pt-8 pb-24">
       <div class="h-full container">
         <slot/>
@@ -120,13 +120,13 @@ const leave = () => {
                    @click="currentPath === '/timer' ? confirmNavigation('/') : null"
                    :to="currentPath === '/timer' ? null : '/'"
                    class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
-                   activeClass="!opacity-100"
+                   activeClass="!opacity-100 font-semibold"
         >
-          <Calendar class="size-5"/>
+          <Home class="size-5"/>
           Home
         </component>
         <SessionDialog>
-          <button :class="[{'!opacity-100' : currentPath === '/timer'}, 'inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50']" :disabled="currentPath === '/timer'">
+          <button :class="[{'!opacity-100 font-semibold' : currentPath === '/timer'}, 'inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50']" :disabled="currentPath === '/timer'">
             <Timer class="size-5"/>
             Stopwatch
           </button>
@@ -135,7 +135,7 @@ const leave = () => {
                    @click="currentPath === '/timer' ? confirmNavigation('/sessions') : null"
             :to="currentPath === '/timer' ? null : '/sessions'"
             class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
-            activeClass="!opacity-100"
+            activeClass="!opacity-100 font-semibold"
         >
           <Calendar class="size-5"/>
           Sessies
@@ -153,7 +153,6 @@ const leave = () => {
         <Button @click="leave" variant="destructive" class="w-full">Verlaten</Button>
       </DialogFooter>
     </DialogContent>
-
   </Dialog>
 </template>
 

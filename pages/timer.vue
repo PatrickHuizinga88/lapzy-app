@@ -39,7 +39,6 @@ const saveSession = async (laps: Lap[], duration: string) => {
     })))
     if (lapsError) throw lapsError
 
-    alert('Sessie opgeslagen!')
     navigateTo('/sessions')
   } catch (error) {
     console.error(error)

@@ -14,3 +14,7 @@ onMounted(() => {
   applyTheme()
 })
 </script>
+
+<template>
+
+</template>

@@ -2,6 +2,7 @@
 import StatCard from "~/components/StatCard.vue";
 import type { Database } from "~/types/supabase";
 import { Play } from 'lucide-vue-next'
+import dayjs from "dayjs";
 
 const user = useSupabaseUser()
 const supabase = useSupabaseClient<Database>()
@@ -43,6 +44,28 @@ const {data: profile} = await useAsyncData('profile', async () => {
   if (error) throw error
   return data
 })
+
+const {data: statistics} = await useAsyncData('statistics', async () => {
+  const {count: sessionsAmount, error: errorSessions} = await supabase.from('sessions')
+      .select('*', {head:true, count: 'exact'})
+      .eq('user_id', user.value.id)
+      .gte('created_at', dayjs().subtract(1, 'month'))
+  if (errorSessions) throw errorSessions
+
+  const {data: tracksVisited, error: errorTracks} = await supabase.from('sessions')
+      .select('track_id', {count: 'exact'})
+      .eq('user_id', user.value.id)
+      .gte('created_at', dayjs().subtract(1, 'month'))
+  if (errorTracks) throw errorTracks
+
+  const uniqueTracksVisited = tracksVisited.map(track => track.track_id)
+      .filter((value, index, self) => self.indexOf(value) === index)
+
+  return {
+    sessionsAmount,
+    tracksVisited: uniqueTracksVisited.length
+  }
+})
 </script>
 
 <template>
@@ -51,16 +74,16 @@ const {data: profile} = await useAsyncData('profile', async () => {
       Welkom terug<template v-if="profile?.first_name">, {{profile.first_name}}</template>!
     </h1>
 
-<!--    <section>-->
-<!--      <h2 class="font-semibold mb-2">Statistieken</h2>-->
-<!--      <div class="overflow-x-auto">-->
-<!--        <div class="flex gap-x-2 *:shrink-0">-->
-<!--          <StatCard title="Uren gereden" value="5,3"/>-->
-<!--          <StatCard title="Sessies" value="17"/>-->
-<!--          <StatCard title="Banen bezocht" value="3"/>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </section>-->
+    <section>
+      <h2 class="font-semibold mb-2">Jouw afgelopen maand</h2>
+      <div class="overflow-x-auto">
+        <div class="flex gap-x-2 *:shrink-0">
+<!--          <StatCard title="Uren gereden" value="5,3" />-->
+          <StatCard title="Sessies" :value="statistics?.sessionsAmount" />
+          <StatCard title="Banen bezocht" :value="statistics?.tracksVisited" />
+        </div>
+      </div>
+    </section>
 
     <section>
       <div class="flex items-center justify-between mb-2">
