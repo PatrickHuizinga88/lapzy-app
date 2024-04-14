@@ -13,15 +13,12 @@ const {data: session} = await useAsyncData('session', async () => {
         .single()
     if (error) throw error
 
-    console.log(sessionDetails)
-
     const { data: laps } = await supabase
         .from('lap_times')
         .select('*')
         .eq('session_id', id)
     if (error) throw error
 
-    console.log(laps)
     return {
       ...sessionDetails,
       laps

@@ -14,3 +14,8 @@ export interface Track {
   lat?: string
   created_at: string
 }
+
+export interface Lap {
+  time: string
+  duration: string
+}
