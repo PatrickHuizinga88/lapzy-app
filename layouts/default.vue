@@ -5,6 +5,9 @@ import type {Database} from "~/types/supabase";
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 
+const open = ref(false)
+const newLocation = ref('')
+
 const { data: profile } = await useAsyncData('profile', async () => {
   if (!user.value) {
     navigateTo('/login')
@@ -39,6 +42,26 @@ const logOut = async () => {
   navigateTo('/login')
 }
 
+const componentToShow = computed(() => {
+  if (currentPath.value === '/timer') {
+    return 'button';
+  }
+
+  return resolveComponent('NuxtLink');
+});
+
+const confirmNavigation = (path: string) => {
+  if (currentPath.value !== '/timer') navigateTo(path)
+
+  open.value = true
+  newLocation.value = path
+}
+
+const leave = () => {
+  navigateTo(newLocation.value)
+  open.value = false
+  newLocation.value = ''
+}
 </script>
 
 <template>
@@ -93,31 +116,45 @@ const logOut = async () => {
     </div>
     <div class="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t border-border">
       <div class="grid grid-cols-3 h-full max-w-lg mx-auto font-medium text-xs">
-        <NuxtLink
-            to="/"
-            class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
-            activeClass="!opacity-100"
+        <component :is="componentToShow"
+                   @click="currentPath === '/timer' ? confirmNavigation('/') : null"
+                   :to="currentPath === '/timer' ? null : '/'"
+                   class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
+                   activeClass="!opacity-100"
         >
-          <Home class="size-5"/>
+          <Calendar class="size-5"/>
           Home
-        </NuxtLink>
+        </component>
         <SessionDialog>
           <button :class="[{'!opacity-100' : currentPath === '/timer'}, 'inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50']" :disabled="currentPath === '/timer'">
             <Timer class="size-5"/>
             Stopwatch
           </button>
         </SessionDialog>
-        <NuxtLink
-            to="/sessions"
+        <component :is="componentToShow"
+                   @click="currentPath === '/timer' ? confirmNavigation('/sessions') : null"
+            :to="currentPath === '/timer' ? null : '/sessions'"
             class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
             activeClass="!opacity-100"
         >
           <Calendar class="size-5"/>
           Sessies
-        </NuxtLink>
+        </component>
       </div>
     </div>
   </main>
+
+  <Dialog v-bind:open="open">
+    <DialogContent>
+      <DialogTitle>Pagina verlaten?</DialogTitle>
+      <DialogDescription>Je huidige sessie zal niet worden opgeslagen.</DialogDescription>
+      <DialogFooter class="flex-row gap-x-4">
+        <Button @click="open = false" variant="secondary" class="w-full">Annuleren</Button>
+        <Button @click="leave" variant="destructive" class="w-full">Verlaten</Button>
+      </DialogFooter>
+    </DialogContent>
+
+  </Dialog>
 </template>
 
 <style scoped>

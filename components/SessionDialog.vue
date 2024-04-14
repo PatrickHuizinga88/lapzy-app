@@ -75,18 +75,18 @@ const handleSubmit = () => {
         <div class="flex flex-col gap-y-2">
           <div v-for="track in featuredTracks">
             <input type="radio" :id="track.id.toString()" name="selected-track" v-model="selectedTrack" :value="track.id" class="hidden peer" />
-            <Label
+            <label
                 :for="track.id.toString()"
-                class="inline-flex items-center justify-between w-full px-4 py-3 bg-background border border-input rounded-lg cursor-pointer peer-checked:border-primary peer-checked:text-primary peer-checked:bg-primary/10 hover:bg-muted"
+                class="inline-flex items-center justify-between w-full px-4 py-4 bg-background border border-input rounded-lg cursor-pointer peer-checked:border-primary peer-checked:text-primary peer-checked:bg-primary/10 hover:bg-muted"
             >
               {{ track.name }}
               <Star class="size-5 text-yellow-400"/>
-            </Label>
+            </label>
           </div>
         </div>
 
         <div>
-          <Label class="inline-block mb-3">Hoe ligt de baan?</Label>
+          <label class="inline-block mb-3">Hoe ligt de baan?</label>
           <div class="grid grid-cols-3 gap-x-3">
             <div v-for="condition in conditions">
               <input type="radio" :id="condition.value" name="condition" v-model="selectedCondition" :value="condition.value" class="hidden peer" />

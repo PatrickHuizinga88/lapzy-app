@@ -9,19 +9,28 @@ const {data: sessions, pending: pending} = useAsyncData('sessions', async () => 
     navigateTo('/login')
     return
   }
-  const {data, error} = await supabase.from('sessions')
+  const {data} = await supabase.from('sessions')
       .select('id,track_id,duration,created_at')
-      .order('created_at', {ascending: false})
       .eq('user_id', user.value.id)
-  if (error) throw error
-  return data
+      .order('created_at', {ascending: false})
+
+  if (!data) return []
+
+  return await Promise.all(data.map(async session => {
+    const { data: track, error } = await supabase.from('tracks')
+        .select('name')
+        .eq('id', session.track_id)
+        .single()
+    if (error) throw error
+    return {...session, track_name: track.name}
+  }))
 })
 </script>
 
 <template>
   <h1 class="text-2xl sm:text-3xl font-semibold mb-6">Jouw sessies</h1>
   <div class="space-y-2">
-    <SessionCard v-if="!pending && sessions?.length" v-for="session in sessions" :key="session.id" :session="session"/>
+    <SessionCard v-if="!pending && sessions?.length" v-for="session in sessions" :key="session.id" :session="session" :trackName="session.track_name"/>
     <template v-else-if="pending">
       <Skeleton v-for="i in 4" class="h-16 w-full"/>
     </template>

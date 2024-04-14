@@ -6,7 +6,7 @@ import { Play } from 'lucide-vue-next'
 const user = useSupabaseUser()
 const supabase = useSupabaseClient<Database>()
 
-const {data: recentSessions, pending: pendingSessions} = useAsyncData('sessions', async () => {
+const {data: recentSessions, pending: pendingSessions} = await useAsyncData('sessions', async () => {
   if (!user.value) {
     navigateTo('/login')
     return
@@ -17,7 +17,17 @@ const {data: recentSessions, pending: pendingSessions} = useAsyncData('sessions'
       .eq('user_id', user.value.id)
       .order('created_at', {ascending: false})
       .limit(3)
-  return data
+
+  if (!data) return []
+
+  return await Promise.all(data.map(async session => {
+    const { data: track, error } = await supabase.from('tracks')
+        .select('name')
+        .eq('id', session.track_id)
+        .single()
+    if (error) throw error
+    return {...session, track_name: track.name}
+  }))
 })
 
 const {data: profile} = await useAsyncData('profile', async () => {
@@ -62,7 +72,9 @@ const {data: profile} = await useAsyncData('profile', async () => {
         </Button>
       </div>
       <div class="space-y-2">
-        <SessionCard v-if="recentSessions?.length" v-for="session in recentSessions" :key="session.id" :session="session"/>
+        <template v-if="recentSessions && recentSessions.length">
+          <SessionCard v-for="session in recentSessions" :session="session" :trackName="session.track_name" />
+        </template>
         <template v-else-if="pendingSessions">
           <Skeleton v-for="i in 3" class="h-16 w-full"/>
         </template>

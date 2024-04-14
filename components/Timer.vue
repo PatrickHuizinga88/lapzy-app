@@ -81,6 +81,10 @@ const discardSession = () => {
   timeElapsed.value = 0
   totalTimeElapsed.value = 0
 }
+
+onUnmounted(() => {
+  clearInterval(interval.value)
+})
 </script>
 
 <template>
