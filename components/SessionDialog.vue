@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import {Star} from "lucide-vue-next";
+import {MapPin, Loader2} from "lucide-vue-next";
 import type {Database} from "~/types/supabase";
 import type {Track} from "~/types";
+import {useGeolocation} from "@vueuse/core";
 
 const supabase = useSupabaseClient<Database>()
 
@@ -27,7 +28,7 @@ const { data: tracks } = await useAsyncData('tracks', async () => {
   const { data, error } = await supabase
       .from('tracks')
       .select('id, name, location')
-      .order('name', {ascending: true})
+      .order('location', {ascending: true})
   if (error) throw error
   return data.filter(track => !featuredTracks.some(featuredTrack => featuredTrack.id === track.id))
 })
@@ -49,12 +50,35 @@ const conditions = [
 
 const selectedTrack = ref<number | undefined>(undefined)
 const selectedCondition = ref('MEDIUM')
-const error = ref('')
+const formError = ref('')
+const locationError = ref('')
 const open = ref(false)
+const trackSelect = ref(null)
+
+const { data: nearbyTrack, pending, execute } = await useAsyncData('nearbyTrack', async () => {
+  if (!coords.value) return
+  console.log(coords.value.latitude, coords.value.longitude)
+  const { data, error } = await supabase.rpc('closest_track', {
+    lat: coords.value.latitude,
+    long: coords.value.longitude,
+  }).limit(1).single()
+  if (error) throw error
+  if (data.dist_meters > 1000) {
+    locationError.value = 'Geen baan gevonden in de buurt'
+    if (trackSelect.value) trackSelect.value.focus()
+    return
+  }
+  selectedTrack.value = data.id.toString()
+  return data
+}, {
+  immediate: false,
+})
+
+const { coords, error: geoError } = useGeolocation()
 
 const handleSubmit = () => {
   if (selectedTrack.value === undefined) {
-    error.value = 'Selecteer een baan'
+    formError.value = 'Selecteer een baan'
     return
   }
 
@@ -69,7 +93,7 @@ const handleSubmit = () => {
   open.value = false
   selectedTrack.value = undefined
   selectedCondition.value = 'MEDIUM'
-  error.value = ''
+  formError.value = ''
 }
 </script>
 
@@ -99,10 +123,18 @@ const handleSubmit = () => {
 <!--              <Star class="size-5 text-yellow-400"/>-->
 <!--            </label>-->
 <!--          </div>-->
+<!--          {{ nearbyTrack }}-->
+<!--          {{ coordinates?.latitude + ', ' + coordinates?.longitude }}-->
+          <Button @click="execute" type="button" variant="secondary">
+            Locatie ophalen
+<!--            <Loader2 v-if="pending" class="size-5 ml-2.5 animate-spin" />-->
+            <MapPin class="size-5 ml-2.5" />
+          </Button>
+          <p class="text-red-500 text-sm">{{ locationError }}</p>
 
           <Select v-if="tracks" v-model="selectedTrack">
-            <SelectTrigger>
-              <SelectValue placeholder="Selecteer een baan" />
+            <SelectTrigger ref="trackSelect">
+              <SelectValue placeholder="Handmatig selecteren" />
             </SelectTrigger>
             <SelectContent>
 <!--              <SelectGroup>-->
@@ -111,7 +143,9 @@ const handleSubmit = () => {
 <!--              </SelectGroup>-->
 <!--              <SelectGroup>-->
 <!--                <SelectLabel>Andere banen</SelectLabel>-->
-                <SelectItem v-for="track in tracks" :value="track.id.toString()">{{track.name}} <span v-if="track.location" class="text-muted-foreground">- {{ track.location }}</span></SelectItem>
+                <SelectItem v-for="track in tracks" :value="track.id.toString()">
+                  {{track.location}} <span v-if="track.location" class="text-muted-foreground">- {{ track.name }}</span>
+                </SelectItem>
 <!--              </SelectGroup>-->
             </SelectContent>
           </Select>
@@ -132,7 +166,7 @@ const handleSubmit = () => {
           </div>
         </div>
 
-        <p v-if="error" class="text-red-500 text-sm">{{ error }}</p>
+        <p v-if="formError" class="text-red-500 text-sm">{{ formError }}</p>
 
         <Button type="submit" size="lg" class="w-full">Start sessie</Button>
       </form>

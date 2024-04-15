@@ -30,7 +30,8 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
     '@nuxtjs/supabase',
-    'dayjs-nuxt'
+    'dayjs-nuxt',
+    '@vueuse/nuxt',
   ],
   shadcn: {
     componentDir: './components/ui'
