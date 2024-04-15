@@ -61,14 +61,14 @@ const { data: nearbyTrack, pending, execute } = await useAsyncData('nearbyTrack'
   const { data, error } = await supabase.rpc('closest_track', {
     lat: coords.value.latitude,
     long: coords.value.longitude,
-  }).limit(1).single()
+  }).limit(5)
   if (error) throw error
-  if (data.dist_meters > 1000) {
-    locationError.value = 'Geen baan gevonden in de buurt'
-    if (trackSelect.value) trackSelect.value.focus()
-    return
-  }
-  selectedTrack.value = data.id.toString()
+  // if (data.dist_meters > 1000) {
+  //   locationError.value = 'Geen baan gevonden in de buurt'
+  //   if (trackSelect.value) trackSelect.value.focus()
+  //   return
+  // }
+  selectedTrack.value = data[0].id.toString()
   return data
 }, {
   immediate: false,
@@ -123,7 +123,11 @@ const handleSubmit = () => {
 <!--              <Star class="size-5 text-yellow-400"/>-->
 <!--            </label>-->
 <!--          </div>-->
-<!--          {{ nearbyTrack }}-->
+          <ol v-if="nearbyTrack?.length">
+            <li v-for="(item, index) in nearbyTrack">
+              <span>{{ index + 1 + '. '}}</span>{{ item.location }} - {{ Math.round(item.dist_meters) }}m afstand
+            </li>
+          </ol>
 <!--          {{ coordinates?.latitude + ', ' + coordinates?.longitude }}-->
           <Button @click="execute" type="button" variant="secondary">
             Locatie ophalen
