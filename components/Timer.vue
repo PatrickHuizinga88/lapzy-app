@@ -90,11 +90,11 @@ onUnmounted(() => {
 <template>
   <div class="h-full flex flex-col">
     <div class="flex items-center justify-center text-5xl font-medium text-center">
-      <div class="w-16">{{ formattedTime(timeElapsed).min }}</div>
+      <div class="w-16 tabular-nums">{{ formattedTime(timeElapsed).min }}</div>
       :
-      <div class="w-16">{{ formattedTime(timeElapsed).sec }}</div>
+      <div class="w-16 tabular-nums">{{ formattedTime(timeElapsed).sec }}</div>
       .
-      <div class="w-16">{{ formattedTime(timeElapsed).ms }}</div>
+      <div class="w-16 tabular-nums">{{ formattedTime(timeElapsed).ms }}</div>
     </div>
 
     <div class="mt-auto">

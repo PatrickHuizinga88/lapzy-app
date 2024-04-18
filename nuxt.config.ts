@@ -26,6 +26,9 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
     '~/assets/css/tailwind.css',
   ],
+  runtimeConfig:{
+    baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+  },
   modules: [
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
@@ -33,6 +36,9 @@ export default defineNuxtConfig({
     'dayjs-nuxt',
     '@vueuse/nuxt',
   ],
+  supabase: {
+    redirect: false
+  },
   shadcn: {
     componentDir: './components/ui'
   }

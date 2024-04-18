@@ -75,7 +75,7 @@ const {data: statistics} = await useAsyncData('statistics', async () => {
     </h1>
 
     <section>
-      <h2 class="font-semibold mb-2">Jouw afgelopen maand</h2>
+      <h2 class="font-semibold mb-3">Jouw afgelopen maand</h2>
       <div class="overflow-x-auto">
         <div class="flex gap-x-2 *:shrink-0">
 <!--          <StatCard title="Uren gereden" value="5,3" />-->

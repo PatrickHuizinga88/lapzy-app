@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type {Database} from "~/types/supabase";
+import {Loader2} from "lucide-vue-next";
 
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 
-const { data: profile } = await useAsyncData('profile', async () => {
+const { data: profile, pending } = await useAsyncData('profile', async () => {
   if (!user.value) {
     navigateTo('/login')
     return
@@ -24,10 +25,10 @@ const { data: profile } = await useAsyncData('profile', async () => {
 })
 
 const form = reactive({
-  first_name: profile.value.first_name || '',
-  last_name: profile.value.last_name || '',
-  rider_number: profile.value.rider_number || '',
-  theme:  profile.value.theme || '220 76% 49%'
+  first_name: profile.value?.first_name || '',
+  last_name: profile.value?.last_name || '',
+  rider_number: profile.value?.rider_number || '',
+  theme:  profile.value?.theme || '220 76% 49%'
 })
 
 const themes = [
@@ -85,7 +86,7 @@ const onSubmit = async () => {
           id="first_name"
           name="first_name"
           type="text"
-          required/>
+          />
     </div>
     <div>
       <Label for="last_name">Achternaam</Label>
@@ -94,7 +95,7 @@ const onSubmit = async () => {
           id="last_name"
           name="last_name"
           type="text"
-          required/>
+          />
     </div>
     <div>
       <Label for="rider_number">Rijdersnummer</Label>
@@ -106,7 +107,7 @@ const onSubmit = async () => {
           class="w-24"
           min="1"
           max="9999"
-          required/>
+          />
     </div>
     <div>
       <Label>Thema</Label>
@@ -122,8 +123,9 @@ const onSubmit = async () => {
       </div>
     </div>
 
-    <Button type="submit" class="w-full">
+    <Button type="submit" class="w-full" :disabled="pending">
       Opslaan
+      <Loader2 v-if="pending" class="size-5 ml-2 animate-spin"/>
     </Button>
   </form>
 </template>
