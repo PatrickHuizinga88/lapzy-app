@@ -24,7 +24,7 @@ const featuredTracks = [
   },
 ]
 
-const { data: tracks } = await useAsyncData('tracks', async () => {
+const { data: tracks } = useAsyncData('tracks', async () => {
   const { data, error } = await supabase
       .from('tracks')
       .select('id, name, location')
@@ -54,27 +54,53 @@ const formError = ref('')
 const locationError = ref('')
 const open = ref(false)
 const trackSelect = ref(null)
+const coordinates = ref(null)
+const loadingLocation = ref(false)
 
-const { data: nearbyTrack, pending, execute } = await useAsyncData('nearbyTrack', async () => {
-  if (!coords.value) return
-  console.log(coords.value.latitude, coords.value.longitude)
+const getLocation = async () => {
+  loadingLocation.value = true
+
+  try {
+    coordinates.value = await getCoords()
+    await execute()
+  } catch {
+    locationError.value = 'Locatie kan niet worden opgehaald'
+  } finally {
+    loadingLocation.value = false
+  }
+}
+
+const getCoords = async () => {
+  const { coords } = useGeolocation()
+  return new Promise((resolve, reject) => {
+    watch(coords, (newCoords) => {
+      if (newCoords && newCoords.latitude !== Infinity && newCoords.longitude !== Infinity) {
+        resolve(newCoords)
+      }
+    }, { immediate: true })
+    setTimeout(() => reject(
+      new Error('Location not found')
+    ), 10000)
+  })
+}
+
+const { execute } = await useAsyncData('nearbyTrack', async () => {
   const { data, error } = await supabase.rpc('closest_track', {
-    lat: coords.value.latitude,
-    long: coords.value.longitude,
-  }).limit(5)
+    lat: coordinates.value.latitude,
+    long: coordinates.value.longitude,
+  }).limit(1).single()
   if (error) throw error
-  // if (data.dist_meters > 1000) {
-  //   locationError.value = 'Geen baan gevonden in de buurt'
-  //   if (trackSelect.value) trackSelect.value.focus()
-  //   return
-  // }
-  selectedTrack.value = data[0].id.toString()
+  if (data.dist_meters > 1000) {
+    locationError.value = 'Geen baan gevonden in de buurt'
+    if (trackSelect.value) trackSelect.value.focus()
+    return
+  }
+  selectedTrack.value = data.id.toString()
+  locationError.value = ''
   return data
 }, {
   immediate: false,
 })
-
-const { coords, error: geoError } = useGeolocation()
 
 const handleSubmit = () => {
   if (selectedTrack.value === undefined) {
@@ -117,24 +143,19 @@ const handleSubmit = () => {
 <!--            >-->
 <!--              <div class="flex flex-col font-medium">-->
 <!--                {{ track.name }}-->
-<!--                <span class="text-sm opacity-60 font-normal">{{ track.location }}</span>-->
+<!--                <span class="text-sm opacity-60 font-normal">{{  track.location }}</span>-->
 <!--              </div>-->
 
 <!--              <Star class="size-5 text-yellow-400"/>-->
 <!--            </label>-->
 <!--          </div>-->
-          <ol v-if="nearbyTrack?.length">
-            <li v-for="(item, index) in nearbyTrack">
-              <span>{{ index + 1 + '. '}}</span>{{ item.location }} - {{ Math.round(item.dist_meters) }}m afstand
-            </li>
-          </ol>
-<!--          {{ coordinates?.latitude + ', ' + coordinates?.longitude }}-->
-          <Button @click="execute" type="button" variant="secondary">
+          <Button @click="getLocation" type="button" variant="secondary">
             Locatie ophalen
-<!--            <Loader2 v-if="pending" class="size-5 ml-2.5 animate-spin" />-->
-            <MapPin class="size-5 ml-2.5" />
+            <Loader2 v-if="loadingLocation" class="size-5 ml-2 animate-spin" />
+            <MapPin v-else class="size-5 ml-2" />
           </Button>
-          <p class="text-red-500 text-sm">{{ locationError }}</p>
+
+          <p v-if="locationError" class="text-red-500 text-sm">{{ locationError }}</p>
 
           <Select v-if="tracks" v-model="selectedTrack">
             <SelectTrigger ref="trackSelect">
@@ -148,7 +169,7 @@ const handleSubmit = () => {
 <!--              <SelectGroup>-->
 <!--                <SelectLabel>Andere banen</SelectLabel>-->
                 <SelectItem v-for="track in tracks" :value="track.id.toString()">
-                  {{track.location}} <span v-if="track.location" class="text-muted-foreground">- {{ track.name }}</span>
+                  {{track.name}} <span v-if="track.location" class="text-muted-foreground">- {{ track.location }}</span>
                 </SelectItem>
 <!--              </SelectGroup>-->
             </SelectContent>
