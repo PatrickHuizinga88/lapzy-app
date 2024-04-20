@@ -69,7 +69,7 @@ const leave = () => {
   <ClientOnly>
     <ThemeProvider :theme="profile?.theme" />
   </ClientOnly>
-  <header class="sticky top-0 left-0 h-[72px] bg-background border-b border-border py-4">
+  <header class="sticky top-0 left-0 flex justify-between items-center h-[var(--header-height)] bg-background border-b border-border">
     <div class="container">
       <div class="flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center">
@@ -89,7 +89,7 @@ const leave = () => {
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
             <Button variant="ghost" size="icon" class="-mr-2.5">
-              <User class="size-5"/>
+              <img src="../assets/images/helmet.svg" alt="Gebruiker" class="size-5"/>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent :align-offset="10">
@@ -156,6 +156,8 @@ const leave = () => {
   </Dialog>
 </template>
 
-<style scoped>
-
+<style>
+:root {
+  --header-height: 64px;
+}
 </style>
