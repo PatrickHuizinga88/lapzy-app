@@ -23,11 +23,11 @@ const {data: recentSessions, pending: pendingSessions} = await useAsyncData('ses
 
   return await Promise.all(data.map(async session => {
     const { data: track, error } = await supabase.from('tracks')
-        .select('name')
+        .select('name,location')
         .eq('id', session.track_id)
         .single()
     if (error) throw error
-    return {...session, track_name: track.name}
+    return {...session, track_name: track.name, track_location: track.location}
   }))
 })
 
@@ -96,7 +96,7 @@ const {data: statistics} = await useAsyncData('statistics', async () => {
       </div>
       <div class="space-y-2">
         <template v-if="recentSessions && recentSessions.length">
-          <SessionCard v-for="session in recentSessions" :session="session" :trackName="session.track_name" />
+          <SessionCard v-for="session in recentSessions" :session="session" :trackName="session.track_name" :trackLocation="session.track_location" />
         </template>
         <template v-else-if="pendingSessions">
           <Skeleton v-for="i in 3" class="h-16 w-full"/>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {MapPin, Loader2} from "lucide-vue-next";
 import type {Database} from "~/types/supabase";
-import type {Track} from "~/types";
 import {useGeolocation} from "@vueuse/core";
 
 const supabase = useSupabaseClient<Database>()
@@ -169,7 +168,14 @@ const handleSubmit = () => {
 <!--              <SelectGroup>-->
 <!--                <SelectLabel>Andere banen</SelectLabel>-->
                 <SelectItem v-for="track in tracks" :value="track.id.toString()">
-                  {{track.name}} <span v-if="track.location" class="text-muted-foreground">- {{ track.location }}</span>
+                  {{track.name }}
+
+                  <span :class="{'text-muted-foreground': track.name}" v-if="track.location">
+                    <template v-if="track.name">
+                    -
+                    </template>
+                    {{ track.location }}
+                  </span>
                 </SelectItem>
 <!--              </SelectGroup>-->
             </SelectContent>
