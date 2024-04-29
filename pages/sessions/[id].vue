@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {Database} from "~/types/supabase";
+import { ArrowLeft } from 'lucide-vue-next';
 
 const { id } = useRoute().params
 const supabase = useSupabaseClient<Database>()
@@ -33,24 +34,56 @@ const {data: session} = await useAsyncData('session', async () => {
     console.error(error)
   }
 })
+
+const fastestLapTime = computed(() => {
+  if (!session.value) return
+  const fastestLap = session.value.laps.reduce((prev, current) => (prev.time < current.time) ? prev : current)
+  return fastestLap.time
+})
+
+const trackCondition = computed(() => {
+  if (!session.value) return
+  switch (session.value.condition) {
+    case 'GOOD':
+      return 'Perfect'
+    case 'HEAVY':
+      return 'Zwaar'
+    case 'MEDIUM':
+      return 'Ingereden'
+  }
+})
 </script>
 
 <template>
-  <div class="h-full">
-    <h1 class="text-center text-lg">Je sessie in <span class="block text-3xl font-semibold mt-2 mb-16">{{ session.track.name }}</span></h1>
+  <Button @click="$router.back()" variant="ghost" size="sm" class="text-muted-foreground mb-6 -ml-3">
+    <ArrowLeft class="size-4 mr-2" />
+    Terug
+  </Button>
 
-    <div class="mb-16">
-      <h2 class="text-xl font-semibold text-center mb-4">Totale duur</h2>
-      <p class="text-center text-3xl font-semibold">{{ session.duration }}</p>
+  <div class="space-y-12 text-center">
+    <div>
+      <h1 class="text-lg">Je sessie in <span class="block text-3xl font-semibold my-2">{{ session?.track.name }}</span></h1>
+      <p class="text-muted-foreground">{{ $dayjs(session?.created_at).format('DD-MM-YYYY') }}</p>
     </div>
 
-    <h2 class="text-xl font-semibold text-center mb-4">Rondetijden</h2>
-    <ol class="space-y-2">
-      <li v-for="(lap, index) in session?.laps" class="flex items-center justify-between">
-        <span class="inline-flex items-center justify-center bg-muted font-medium rounded text-muted-foreground size-6">{{ index + 1 }}</span>
-        {{ lap.time }}
-      </li>
-    </ol>
+    <div class="space-y-3">
+      <StatCard class="w-full" title="Snelste ronde" :value="fastestLapTime" />
+
+      <div class="grid grid-cols-2 gap-3">
+        <StatCard class="w-full" title="Totale duur" :value="session?.duration" />
+        <StatCard class="w-full" title="Baanconditie" :value="trackCondition" />
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-xl font-semibold mb-4">Rondetijden</h2>
+      <ol class="space-y-3">
+        <li v-for="(lap, index) in session?.laps" class="flex items-center justify-between">
+          <span class="inline-flex items-center justify-center bg-primary/15 font-medium rounded text-primary size-6 mr-2">{{ index + 1 }}</span>
+          {{ lap.time }}
+        </li>
+      </ol>
+    </div>
   </div>
 </template>
 

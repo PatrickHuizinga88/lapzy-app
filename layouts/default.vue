@@ -69,7 +69,7 @@ const leave = () => {
   <ClientOnly>
     <ThemeProvider :theme="profile?.theme" />
   </ClientOnly>
-  <header class="sticky top-0 left-0 h-[72px] bg-background border-b border-border py-4">
+  <header class="sticky top-0 left-0 flex justify-between items-center h-[var(--header-height)] bg-background border-b border-border">
     <div class="container">
       <div class="flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center">
@@ -89,7 +89,7 @@ const leave = () => {
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
             <Button variant="ghost" size="icon" class="-mr-2.5">
-              <User class="size-5"/>
+              <img src="../assets/images/helmet.svg" alt="Gebruiker" class="size-5"/>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent :align-offset="10">
@@ -108,13 +108,13 @@ const leave = () => {
       </div>
     </div>
   </header>
-  <main class="h-[calc(100svh-72px)] overflow-auto">
-    <div class="h-full pt-8 pb-24">
+  <main class="h-[calc(100svh-var(--header-height)-var(--navbar-height))] overflow-auto">
+    <div class="h-full py-8">
       <div class="h-full container">
         <slot/>
       </div>
     </div>
-    <div class="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t border-border">
+    <div class="fixed bottom-0 left-0 z-50 w-full h-[var(--navbar-height)] bg-background border-t border-border">
       <div class="grid grid-cols-3 h-full max-w-lg mx-auto font-medium text-xs">
         <component :is="componentToShow"
                    @click="currentPath === '/timer' ? confirmNavigation('/') : null"
@@ -156,6 +156,9 @@ const leave = () => {
   </Dialog>
 </template>
 
-<style scoped>
-
+<style>
+:root {
+  --header-height: 64px;
+  --navbar-height: 64px;
+}
 </style>
