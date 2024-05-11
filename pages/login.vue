@@ -22,12 +22,13 @@ const signIn = async () => {
       email:    form.email,
       password: form.password
     })
-    if (error) throw error
+    if (error) {
+      loading.value = false
+      throw error
+    }
     navigateTo('/')
   } catch (error) {
     errorMessage.value = 'Inloggen mislukt'
-  } finally {
-    loading.value = false
   }
 }
 </script>
