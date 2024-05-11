@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {User, Home, Timer, Calendar, LogOut} from 'lucide-vue-next'
+import {User, Home, Timer, Calendar, LogOut, Crown} from 'lucide-vue-next'
 import type {Database} from "~/types/supabase";
 
 const supabase = useSupabaseClient<Database>()
@@ -115,7 +115,7 @@ const leave = () => {
       </div>
     </div>
     <div class="fixed bottom-0 left-0 z-50 w-full h-[var(--navbar-height)] bg-background border-t border-border">
-      <div class="grid grid-cols-3 h-full max-w-lg mx-auto font-medium text-xs">
+      <div class="grid grid-cols-4 h-full max-w-lg mx-auto font-medium text-xs">
         <component :is="componentToShow"
                    @click="currentPath === '/timer' ? confirmNavigation('/') : null"
                    :to="currentPath === '/timer' ? null : '/'"
@@ -139,6 +139,15 @@ const leave = () => {
         >
           <Calendar class="size-5"/>
           Sessies
+        </component>
+        <component :is="componentToShow"
+                   @click="currentPath === '/timer' ? confirmNavigation('/leaderboard') : null"
+                   :to="currentPath === '/timer' ? null : '/leaderboard'"
+                   class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
+                   activeClass="!opacity-100 font-semibold"
+        >
+          <Crown class="size-5"/>
+          Scorebord
         </component>
       </div>
     </div>

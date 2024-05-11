@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Loader2 } from "lucide-vue-next";
+import {Loader2} from "lucide-vue-next";
 import {Input} from "~/components/ui/input";
 
 definePageMeta({
@@ -16,7 +16,7 @@ const form = reactive({
 const errorMessage = ref('')
 const loading = ref(false)
 const success = ref(false)
-const { baseUrl }: {baseUrl: string} = useRuntimeConfig()
+const {baseUrl}: { baseUrl: string } = useRuntimeConfig()
 
 const signUp = async () => {
   if (form.password !== form.repeatedPassword) {
@@ -26,19 +26,20 @@ const signUp = async () => {
 
   try {
     loading.value = true
-    const { error } = await supabase.auth.signUp({
-      email:    form.email,
+    const {error} = await supabase.auth.signUp({
+      email: form.email,
       password: form.password,
       options: {
         emailRedirectTo: baseUrl
       }
     })
-    if (error) throw error
+    if (error) {
+      loading.value = false
+      throw error
+    }
     success.value = true
   } catch (error) {
     errorMessage.value = 'Er ging iets fout. Probeer het later opnieuw.'
-  } finally {
-    loading.value = false
   }
 }
 </script>
@@ -54,7 +55,7 @@ const signUp = async () => {
               id="email"
               name="email"
               type="email"
-              required />
+              required/>
         </div>
 
         <div>
@@ -64,7 +65,7 @@ const signUp = async () => {
               id="password"
               name="password"
               type="password"
-              required />
+              required/>
         </div>
 
         <div>
@@ -74,7 +75,7 @@ const signUp = async () => {
               id="repeat-password"
               name="password"
               type="password"
-              required />
+              required/>
         </div>
 
         <div>
