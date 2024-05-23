@@ -66,16 +66,16 @@ const trackCondition = computed(() => {
       <p class="text-muted-foreground">{{ $dayjs(session?.created_at).format('DD-MM-YYYY') }}</p>
     </div>
 
-    <div class="space-y-3">
+    <section id="stats" class="space-y-3">
       <StatCard class="w-full" title="Snelste ronde" :value="fastestLapTime" />
 
       <div class="grid grid-cols-2 gap-3">
         <StatCard class="w-full" title="Totale duur" :value="session?.duration" />
         <StatCard class="w-full" title="Baanconditie" :value="trackCondition" />
       </div>
-    </div>
+    </section>
 
-    <div>
+    <section id="lap-times">
       <h2 class="text-xl font-semibold mb-4">Rondetijden</h2>
       <ol class="space-y-3">
         <li v-for="(lap, index) in session?.laps" class="flex items-center justify-between">
@@ -83,7 +83,12 @@ const trackCondition = computed(() => {
           {{ lap.time }}
         </li>
       </ol>
-    </div>
+    </section>
+
+    <section id="note">
+      <h2 class="text-xl font-semibold mb-4">Notitie</h2>
+      <p class="text-sm text-muted-foreground">{{ session?.note || 'Geen notitie toegevoegd' }}</p>
+    </section>
   </div>
 </template>
 
