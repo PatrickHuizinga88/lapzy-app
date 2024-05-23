@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {Lap} from "~/types";
+import {SquarePen} from "lucide-vue-next";
 
 defineProps<{
   track?: string
@@ -11,6 +12,9 @@ const interval = ref<number | undefined>(undefined)
 const timerRunning = ref(false)
 
 const laps = ref<Lap[]>([])
+
+const addNote = ref(false)
+const note = ref('')
 
 const emit = defineEmits(['save'])
 
@@ -33,14 +37,6 @@ const setLap = () => {
 const pause = () => {
   timerRunning.value = false
   clearInterval(interval.value)
-}
-
-const reset = () => {
-  timerRunning.value = false
-  clearInterval(interval.value)
-  interval.value = 0
-  timeElapsed.value = 0
-  totalTimeElapsed.value = 0
 }
 
 const formattedTime = (time: number) => {
@@ -72,6 +68,7 @@ const bestLapTime = computed(() => {
 })
 
 const sessionDuration = computed(() => {
+  if (!laps.value.length) return '00:00.00'
   let lastLap = laps.value.slice(-1)[0]
   return lastLap.duration
 })
@@ -132,9 +129,16 @@ onUnmounted(() => {
                   Beste rondetijd
                   <div class="text-2xl font-medium">{{ bestLapTime }}</div>
                 </div>
+                <div>
+                  <Button v-if="!addNote" @click="addNote = true" variant="ghost" size="sm" class="-ml-3">
+                    <SquarePen class="size-4 mr-2"/>
+                    Notitie toevoegen
+                  </Button>
+                  <Textarea v-else v-model="note" placeholder="Notitie" />
+                </div>
                 <DialogFooter class="gap-y-2">
                   <Button variant="secondary" @click="discardSession">Verwijderen</Button>
-                  <Button @click="emit('save', laps, sessionDuration)">Opslaan</Button>
+                  <Button @click="emit('save', laps, sessionDuration, note)">Opslaan</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>

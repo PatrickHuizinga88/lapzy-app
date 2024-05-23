@@ -10,7 +10,7 @@ const {data: sessions, pending: pending} = useAsyncData('sessions', async () => 
     return
   }
   const {data} = await supabase.from('sessions')
-      .select('id,track_id,duration,created_at')
+      .select('id,track_id,duration,note,created_at')
       .eq('user_id', user.value.id)
       .order('created_at', {ascending: false})
 
