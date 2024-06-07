@@ -47,6 +47,17 @@ const themes = [
   },
 ]
 
+const tracks = [
+  {
+    label: "MCO Oirschot",
+    value: "1"
+  },
+  {
+    label: "MAC Budel",
+    value: "2"
+  },
+]
+
 const themeBackground = (theme: string) => {
   return {
     'bg-blue-600': theme === '220 76% 49%',
@@ -119,22 +130,24 @@ const onSubmit = async () => {
       <h2 class="text-lg font-semibold">App instellingen</h2>
       <div>
         <Label class="block">Favoriete crossbanen</Label>
-        <div class="flex gap-4">
-          <div v-for="track in form.favoriteTracks">{{ track.name }}</div>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger as-child>
-            <Button variant="outline" size="sm">
-              Crossbaan toevoegen
-              <PlusCircle class="ml-2 size-4"/>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>
-              test
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+
+        <MultiSelect :options="tracks" placeholder="Selecteer een crossbaan..."/>
+<!--        <div class="flex gap-4">-->
+<!--          <div v-for="track in form.favoriteTracks">{{ track.name }}</div>-->
+<!--        </div>-->
+<!--        <DropdownMenu>-->
+<!--          <DropdownMenuTrigger as-child>-->
+<!--            <Button variant="outline" size="sm">-->
+<!--              Crossbaan toevoegen-->
+<!--              <PlusCircle class="ml-2 size-4"/>-->
+<!--            </Button>-->
+<!--          </DropdownMenuTrigger>-->
+<!--          <DropdownMenuContent>-->
+<!--            <DropdownMenuItem>-->
+<!--              test-->
+<!--            </DropdownMenuItem>-->
+<!--          </DropdownMenuContent>-->
+<!--        </DropdownMenu>-->
       </div>
       <div>
         <Label>Thema</Label>
