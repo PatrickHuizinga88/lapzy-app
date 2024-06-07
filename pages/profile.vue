@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {Database} from "~/types/supabase";
-import {Loader2} from "lucide-vue-next";
+import {PlusCircle, Loader2} from "lucide-vue-next";
 
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
@@ -28,7 +28,8 @@ const form = reactive({
   first_name: profile.value?.first_name || '',
   last_name: profile.value?.last_name || '',
   rider_number: profile.value?.rider_number || '',
-  theme:  profile.value?.theme || '220 76% 49%'
+  theme:  profile.value?.theme || '220 76% 49%',
+  favoriteTracks: profile.value?.favorite_tracks || [],
 })
 
 const themes = [
@@ -78,50 +79,77 @@ const onSubmit = async () => {
 
 <template>
   <h1 class="text-2xl font-bold mb-8">Mijn profiel</h1>
-  <form @submit.prevent="onSubmit" class="space-y-6">
-    <div>
-      <Label for="first_name">Voornaam</Label>
-      <Input
-          v-model="form.first_name"
-          id="first_name"
-          name="first_name"
-          type="text"
+  <form @submit.prevent="onSubmit" class="space-y-8">
+    <section id="profile-settings" class="space-y-6">
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <Label for="first_name">Voornaam</Label>
+          <Input
+              v-model="form.first_name"
+              id="first_name"
+              name="first_name"
+              type="text"
           />
-    </div>
-    <div>
-      <Label for="last_name">Achternaam</Label>
-      <Input
-          v-model="form.last_name"
-          id="last_name"
-          name="last_name"
-          type="text"
+        </div>
+        <div>
+          <Label for="last_name">Achternaam</Label>
+          <Input
+              v-model="form.last_name"
+              id="last_name"
+              name="last_name"
+              type="text"
           />
-    </div>
-    <div>
-      <Label for="rider_number">Rijdersnummer</Label>
-      <Input
-          v-model="form.rider_number"
-          id="rider_number"
-          name="rider_number"
-          type="number"
-          class="w-24"
-          min="1"
-          max="9999"
-          />
-    </div>
-    <div>
-      <Label>Thema</Label>
-      <div class="flex gap-x-3">
-        <div v-for="theme in themes">
-          <input type="radio" :id="theme.value" name="condition" v-model="form.theme" :value="theme.value"
-                 class="hidden peer"/>
-          <Label
-              :for="theme.value"
-              :class="cn('inline-flex items-center justify-center size-8 border border-input rounded-full cursor-pointer peer-checked:outline-none peer-checked:ring-2 peer-checked:ring-ring peer-checked:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', themeBackground(theme.value))"
-          ></Label>
         </div>
       </div>
-    </div>
+      <div>
+        <Label for="rider_number">Rijdersnummer</Label>
+        <Input
+            v-model="form.rider_number"
+            id="rider_number"
+            name="rider_number"
+            type="number"
+            class="w-24"
+            min="1"
+            max="9999"
+        />
+      </div>
+    </section>
+
+    <section id="app-settings" class="space-y-6">
+      <h2 class="text-lg font-semibold">App instellingen</h2>
+      <div>
+        <Label class="block">Favoriete crossbanen</Label>
+        <div class="flex gap-4">
+          <div v-for="track in form.favoriteTracks">{{ track.name }}</div>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button variant="outline" size="sm">
+              Crossbaan toevoegen
+              <PlusCircle class="ml-2 size-4"/>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              test
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div>
+        <Label>Thema</Label>
+        <div class="flex gap-x-3">
+          <div v-for="theme in themes">
+            <input type="radio" :id="theme.value" name="condition" v-model="form.theme" :value="theme.value"
+                   class="hidden peer"/>
+            <Label
+                :for="theme.value"
+                :class="cn('inline-flex items-center justify-center size-8 border border-input rounded-full cursor-pointer peer-checked:outline-none peer-checked:ring-2 peer-checked:ring-ring peer-checked:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', themeBackground(theme.value))"
+            ></Label>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <Button type="submit" class="w-full" :disabled="pending">
       Opslaan
