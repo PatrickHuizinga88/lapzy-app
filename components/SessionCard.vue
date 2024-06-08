@@ -4,7 +4,7 @@ import {Dot, TextSelect} from "lucide-vue-next";
 
 defineProps<{
   session: Session
-  trackName: string
+  trackName?: string
   trackLocation: string
 }>()
 </script>
