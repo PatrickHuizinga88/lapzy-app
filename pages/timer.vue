@@ -3,6 +3,7 @@ import {Trophy} from 'lucide-vue-next'
 import type {Database} from "~/types/supabase";
 import Timer from "~/components/Timer.vue";
 import type {Lap} from "~/types";
+import { useWakeLock } from '@vueuse/core'
 
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
@@ -12,6 +13,10 @@ const { track_id, condition } = useRoute().query
 if (!track_id || !condition) {
   navigateTo('/')
 }
+
+const { request } = useWakeLock()
+
+request("screen")
 
 const { data: track, pending: pendingTrack } = await useAsyncData('track', async () => {
   if (!track_id) return
