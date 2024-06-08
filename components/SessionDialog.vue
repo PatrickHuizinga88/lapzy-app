@@ -183,18 +183,20 @@ const handleSubmit = () => {
         </div>
 
         <div>
-          <label class="inline-block mb-3">Hoe ligt de baan?</label>
-          <div class="grid grid-cols-3 gap-x-3">
-            <div v-for="condition in conditions">
-              <input type="radio" :id="condition.value" name="condition" v-model="selectedCondition" :value="condition.value" class="hidden peer" />
-              <Label
-                  :for="condition.value"
-                  class="inline-flex items-center justify-center w-full px-4 py-3 bg-background border border-input rounded-lg cursor-pointer peer-checked:border-primary peer-checked:text-primary peer-checked:bg-primary/10 hover:bg-muted"
-              >
-                {{ condition.name }}
-              </Label>
+          <fieldset aria-label="Selecteer een baanconditie">
+            <Label class="inline-block mb-3">Hoe ligt de baan?</Label>
+            <div class="grid grid-cols-3 gap-x-3">
+              <div v-for="condition in conditions" class="relative">
+                <input type="radio" :id="condition.value" name="condition" v-model="selectedCondition" :value="condition.value" class="opacity-0 absolute peer" />
+                <Label
+                    :for="condition.value"
+                    class="inline-flex items-center justify-center w-full px-4 py-3 bg-background border border-input rounded-lg cursor-pointer peer-checked:border-primary peer-checked:text-primary peer-checked:bg-primary/10 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 hover:bg-muted"
+                >
+                  {{ condition.name }}
+                </Label>
+              </div>
             </div>
-          </div>
+          </fieldset>
         </div>
 
         <p v-if="formError" class="text-red-500 text-sm">{{ formError }}</p>

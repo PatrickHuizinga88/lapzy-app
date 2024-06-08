@@ -158,7 +158,7 @@ const leave = () => {
       <DialogTitle>Pagina verlaten?</DialogTitle>
       <DialogDescription>Je huidige sessie zal niet worden opgeslagen.</DialogDescription>
       <DialogFooter class="flex-row gap-x-4">
-        <Button @click="open = false" variant="secondary" class="w-full">Annuleren</Button>
+        <Button @click="open = false" variant="outline" class="w-full">Annuleren</Button>
         <Button @click="leave" variant="destructive" class="w-full">Verlaten</Button>
       </DialogFooter>
     </DialogContent>
