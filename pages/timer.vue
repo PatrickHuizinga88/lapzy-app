@@ -14,11 +14,9 @@ if (!track_id || !condition) {
   navigateTo('/')
 }
 
-const { request, isActive } = useWakeLock()
+const { request } = useWakeLock()
 
 request("screen")
-
-watch(() => isActive.value, (value) => console.log('Screen is locked:', value))
 
 const { data: track, pending: pendingTrack } = await useAsyncData('track', async () => {
   if (!track_id) return
