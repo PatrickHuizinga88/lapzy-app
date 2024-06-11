@@ -17,7 +17,6 @@ export default defineNuxtConfig({
         {rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon/apple-touch-icon.png'},
         {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon/favicon-32x32.png'},
         {rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon/favicon-16x16.png'},
-        {rel: 'manifest', href: '/favicon/site.webmanifest'},
         {rel: 'mask-icon', href: '/favicon/safari-pinned-tab.svg', color: '#1e5fde'},
       ],
     },
@@ -35,11 +34,37 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     'dayjs-nuxt',
     '@vueuse/nuxt',
+    '@vite-pwa/nuxt'
   ],
   supabase: {
     redirect: false
   },
   shadcn: {
     componentDir: './components/ui'
+  },
+  pwa: {
+    manifest: {
+      name: 'Lapzy',
+      short_name: 'Lapzy',
+      theme_color: '#1e5ddc',
+      background_color: '#ffffff',
+      icons: [
+        {
+          src: '/favicon/android-chrome-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: '/favicon/android-chrome-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
+    },
+    devOptions: {
+      enabled: true,
+      navigateFallback: '/',
+      type: 'module'
+    }
   }
 })

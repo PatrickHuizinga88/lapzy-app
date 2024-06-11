@@ -65,6 +65,7 @@ const leave = () => {
 </script>
 
 <template>
+  <VitePwaManifest />
   <NuxtLoadingIndicator :color="`hsl(${profile?.theme})`" />
   <ClientOnly>
     <ThemeProvider :theme="profile?.theme" />
