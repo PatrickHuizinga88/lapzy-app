@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { XCircle, Check, ChevronDown } from "lucide-vue-next";
+import { X, XCircle, Check, ChevronDown } from "lucide-vue-next";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,38 +12,42 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
 
 type Option = {
-  label: string;
-  value: string;
-};
+  label: string
+  value: string
+}
 
 const props = defineProps<{
-  options: Option[];
-  placeholder: string;
-}>();
+  options: Option[]
+  selectedOptions?: string[] | number[]
+  placeholder: string
+}>()
 
-const isPopoverOpen = ref(false);
-const selectedValues = ref<Option[]>([]);
+const isPopoverOpen = ref(false)
+const selectedValues = ref<string[] | number[]>(props.selectedOptions || [])
 
 const handleTogglePopover = () => {
-  isPopoverOpen.value = !isPopoverOpen.value;
+  isPopoverOpen.value = !isPopoverOpen.value
 }
 
-const toggleOption = (value: string) => {
-  // const newSelectedValues = selectedValues.includes(value)
-  //     ? selectedValues.filter((v) => v !== value)
-  //     : [...selectedValues, value];
+const toggleOption = (value: string | number) => {
+  selectedValues.value = selectedValues.value.includes(value)
+    ? selectedValues.value.filter((v) => v !== value)
+    : [...selectedValues.value, value]
+
+  emit('itemToggled', selectedValues.value)
 }
 
-const getOptionByValue = (value) => {
+const getOptionByValue = (value: string | number) => {
   return props.options.find((o) => o.value === value) || {};
 }
+
+const emit = defineEmits(['itemToggled'])
 </script>
 
 <template>
@@ -56,8 +60,8 @@ const getOptionByValue = (value) => {
       >
         <template v-if="selectedValues.length > 0">
           <div class="flex justify-between items-center w-full">
-            <div class="flex flex-wrap items-center">
-              <Badge v-for="value in selectedValues">
+            <div class="flex flex-wrap gap-2 items-center">
+              <Badge v-for="value in selectedValues" variant="outline">
                 {{ getOptionByValue(value).label }}
                 <XCircle
                     class="ml-2 h-4 w-4 cursor-pointer"
@@ -66,7 +70,7 @@ const getOptionByValue = (value) => {
               </Badge>
             </div>
             <div class="flex items-center justify-between">
-              <XIcon
+              <X
                   class="h-4 mx-2 cursor-pointer text-muted-foreground"
                   @click.stop="selectedValues = []"
               />
@@ -84,18 +88,17 @@ const getOptionByValue = (value) => {
       </Button>
     </PopoverTrigger>
     <PopoverContent
-        class="w-[200px] p-0 drop-shadow-sm"
+        class="min-w-[200px] p-0 shadow-sm"
         align="start"
-        @escapeKeyDown="isPopoverOpen = false"
     >
       <Command>
-        <CommandInput placeholder="Search..." />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandEmpty>Geen crossbanen gevonden.</CommandEmpty>
           <CommandGroup>
             <CommandItem
                 v-for="option in options"
                 :key="option.value"
+                :value="option.value"
                 @select="toggleOption(option.value)"
                 :style="{ pointerEvents: 'auto', opacity: 1 }"
                 class="cursor-pointer"
@@ -103,7 +106,7 @@ const getOptionByValue = (value) => {
               <div
                   :class="[
                   'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
-                  selectedValues.includes(option)
+                  selectedValues.includes(option.value)
                     ? 'bg-primary text-primary-foreground'
                     : 'opacity-50 [&_svg]:invisible'
                 ]"
@@ -117,21 +120,12 @@ const getOptionByValue = (value) => {
           <CommandGroup>
             <div class="flex items-center justify-between">
               <CommandItem
-                  v-if="selectedValues.length > 0"
-                  @select="selectedValues = []"
-                  :style="{ pointerEvents: 'auto', opacity: 1 }"
-                  class="flex-1 justify-center cursor-pointer"
-              >
-                Clear
-              </CommandItem>
-              <Separator v-if="selectedValues.length > 0" orientation="vertical" class="flex min-h-6 h-full" />
-              <CommandSeparator />
-              <CommandItem
                   @select="isPopoverOpen = false"
                   :style="{ pointerEvents: 'auto', opacity: 1 }"
                   class="flex-1 justify-center cursor-pointer"
+                  value="close"
               >
-                Close
+                Sluiten
               </CommandItem>
             </div>
           </CommandGroup>

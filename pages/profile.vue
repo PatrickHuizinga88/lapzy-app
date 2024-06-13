@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {Database} from "~/types/supabase";
-import {PlusCircle, Loader2} from "lucide-vue-next";
+import {Loader2} from "lucide-vue-next";
 
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
@@ -24,12 +24,42 @@ const { data: profile, pending } = await useAsyncData('profile', async () => {
   }
 })
 
+const { data: tracks, pending: pendingTracks } = await useLazyAsyncData('tracks', async () => {
+  const { data, error } = await supabase
+      .from('tracks')
+      .select('id,name,location')
+      .order('location', {ascending: true})
+  if (error) throw error
+
+  return data.map((track: any) => ({
+    label: track.name || track.location,
+    value: track.id.toString()
+  }))
+})
+
+const { data: favoriteTracks } = await useAsyncData('favoriteTracks', async () => {
+  const { data: favoriteTrackIds, error: favoriteTracksError } = await supabase
+      .from('favorite_tracks')
+      .select('track_id')
+      .eq('profile_id', user.value.id)
+      .single()
+  if (favoriteTracksError) throw favoriteTracksError
+
+  const { data, error } = await supabase
+      .from('tracks')
+      .select('id,name,location')
+      .in('id', favoriteTrackIds.track_id)
+  if (error) throw error
+
+  return data.map((track: any) => track.id.toString())
+})
+
 const form = reactive({
   first_name: profile.value?.first_name || '',
   last_name: profile.value?.last_name || '',
   rider_number: profile.value?.rider_number || '',
   theme:  profile.value?.theme || '220 76% 49%',
-  favoriteTracks: profile.value?.favorite_tracks || [],
+  favoriteTracks: favoriteTracks.value || [],
 })
 
 const themes = [
@@ -47,16 +77,9 @@ const themes = [
   },
 ]
 
-const tracks = [
-  {
-    label: "MCO Oirschot",
-    value: "1"
-  },
-  {
-    label: "MAC Budel",
-    value: "2"
-  },
-]
+const setFavoriteTracks = (tracks: string[]) => {
+  form.favoriteTracks = tracks
+}
 
 const themeBackground = (theme: string) => {
   return {
@@ -70,7 +93,7 @@ const onSubmit = async () => {
   if (!user.value) return
 
   try {
-    const { error } = await supabase
+    const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
           id: user.value.id,
@@ -79,7 +102,16 @@ const onSubmit = async () => {
           rider_number: parseInt(form.rider_number),
           theme: form.theme,
         })
-    if (error) throw error
+    if (profileError) throw profileError
+
+    const { error: favoriteTracksError } = await supabase
+        .from('favorite_tracks')
+        .upsert({
+          profile_id: user.value.id,
+          track_id: form.favoriteTracks,
+        }, { onConflict: 'profile_id' })
+    if (favoriteTracksError) throw favoriteTracksError
+
     location.reload()
   } catch (error) {
     console.error(error)
@@ -92,7 +124,7 @@ const onSubmit = async () => {
   <h1 class="text-2xl font-bold mb-8">Mijn profiel</h1>
   <form @submit.prevent="onSubmit" class="space-y-8">
     <section id="profile-settings" class="space-y-6">
-      <div class="grid grid-cols-2 gap-6">
+      <div class="grid grid-cols-2 gap-4">
         <div>
           <Label for="first_name">Voornaam</Label>
           <Input
@@ -130,24 +162,8 @@ const onSubmit = async () => {
       <h2 class="text-lg font-semibold">App instellingen</h2>
       <div>
         <Label class="block">Favoriete crossbanen</Label>
-
-        <MultiSelect :options="tracks" placeholder="Selecteer een crossbaan..."/>
-<!--        <div class="flex gap-4">-->
-<!--          <div v-for="track in form.favoriteTracks">{{ track.name }}</div>-->
-<!--        </div>-->
-<!--        <DropdownMenu>-->
-<!--          <DropdownMenuTrigger as-child>-->
-<!--            <Button variant="outline" size="sm">-->
-<!--              Crossbaan toevoegen-->
-<!--              <PlusCircle class="ml-2 size-4"/>-->
-<!--            </Button>-->
-<!--          </DropdownMenuTrigger>-->
-<!--          <DropdownMenuContent>-->
-<!--            <DropdownMenuItem>-->
-<!--              test-->
-<!--            </DropdownMenuItem>-->
-<!--          </DropdownMenuContent>-->
-<!--        </DropdownMenu>-->
+        <MultiSelect v-if="tracks" :options="tracks" :selectedOptions="favoriteTracks ?? []" placeholder="Selecteer een crossbaan..." @itemToggled="setFavoriteTracks" />
+        <p v-else>Crossbanen ophalen mislukt.</p>
       </div>
       <div>
         <Label>Thema</Label>
