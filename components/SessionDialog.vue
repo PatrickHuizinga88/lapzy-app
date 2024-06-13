@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import {MapPin, Loader2} from "lucide-vue-next";
+import {MapPin, Star, Loader2} from "lucide-vue-next";
 import type {Database} from "~/types/supabase";
 import {useGeolocation} from "@vueuse/core";
 
 const supabase = useSupabaseClient<Database>()
+const user = useSupabaseUser()
 
 const featuredTracks = [
   {
@@ -23,13 +24,30 @@ const featuredTracks = [
   },
 ]
 
-const { data: tracks } = useAsyncData('tracks', async () => {
+const { data: favoriteTracks } = await useLazyAsyncData('favoriteTracks', async () => {
+  const { data: favoriteTrackIds, error: favoriteTracksError } = await supabase
+      .from('favorite_tracks')
+      .select('track_id')
+      .eq('profile_id', user.value.id)
+      .single()
+  if (favoriteTracksError) throw favoriteTracksError
+
+  const { data, error } = await supabase
+      .from('tracks')
+      .select('id,name,location')
+      .in('id', favoriteTrackIds.track_id)
+  if (error) throw error
+
+  return data
+})
+
+const { data: filteredTracks } = useLazyAsyncData('filteredTracks', async () => {
   const { data, error } = await supabase
       .from('tracks')
       .select('id, name, location')
       .order('location', {ascending: true})
   if (error) throw error
-  return data.filter(track => !featuredTracks.some(featuredTrack => featuredTrack.id === track.id))
+  return data.filter(track => !favoriteTracks.value.some(featuredTrack => featuredTrack.id === track.id))
 })
 
 const conditions = [
@@ -47,7 +65,7 @@ const conditions = [
   },
 ]
 
-const selectedTrack = ref<number | undefined>(undefined)
+const selectedTrack = ref<string | undefined>(undefined)
 const selectedCondition = ref('MEDIUM')
 const formError = ref('')
 const locationError = ref('')
@@ -156,18 +174,19 @@ const handleSubmit = () => {
 
           <p v-if="locationError" class="text-red-500 text-sm">{{ locationError }}</p>
 
-          <Select v-if="tracks" v-model="selectedTrack">
+          <Select v-if="filteredTracks" v-model="selectedTrack">
             <SelectTrigger ref="trackSelect">
               <SelectValue placeholder="Handmatig selecteren" />
             </SelectTrigger>
             <SelectContent>
-<!--              <SelectGroup>-->
-<!--                <SelectLabel>Uitgelichte banen</SelectLabel>-->
-<!--                <SelectItem v-for="track in tracks" :value="track.id.toString()">{{track.name}} <span v-if="track.location" class="text-muted-foreground">- {{ track.location }}</span></SelectItem>-->
-<!--              </SelectGroup>-->
-<!--              <SelectGroup>-->
-<!--                <SelectLabel>Andere banen</SelectLabel>-->
-                <SelectItem v-for="track in tracks" :value="track.id.toString()">
+              <SelectGroup>
+                <SelectLabel>
+                  <div class="flex items-center -ml-6">
+                    <Star class="text-yellow-500 fill-yellow-500 size-4 mr-2"/>
+                    Favoriete banen
+                  </div>
+                </SelectLabel>
+                <SelectItem v-for="track in favoriteTracks" :value="track.id.toString()">
                   {{track.name }}
 
                   <span :class="{'text-muted-foreground': track.name}" v-if="track.location">
@@ -177,7 +196,20 @@ const handleSubmit = () => {
                     {{ track.location }}
                   </span>
                 </SelectItem>
-<!--              </SelectGroup>-->
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Andere banen</SelectLabel>
+                <SelectItem v-for="track in filteredTracks" :value="track.id.toString()">
+                  {{track.name }}
+
+                  <span :class="{'text-muted-foreground': track.name}" v-if="track.location">
+                    <template v-if="track.name">
+                    -
+                    </template>
+                    {{ track.location }}
+                  </span>
+                </SelectItem>
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>

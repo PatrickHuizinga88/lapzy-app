@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 const user = useSupabaseUser()
 const supabase = useSupabaseClient<Database>()
 
-const {data: recentSessions, pending: pendingSessions} = await useAsyncData('sessions', async () => {
+const {data: recentSessions, pending: pendingSessions} = await useLazyAsyncData('recentSessions', async () => {
   if (!user.value) {
     navigateTo('/login')
     return
@@ -31,7 +31,7 @@ const {data: recentSessions, pending: pendingSessions} = await useAsyncData('ses
   }))
 })
 
-const {data: profile} = await useAsyncData('profile', async () => {
+const {data: profile} = await useLazyAsyncData('profile', async () => {
   if (!user.value) {
     navigateTo('/login')
     return
@@ -45,7 +45,7 @@ const {data: profile} = await useAsyncData('profile', async () => {
   return data
 })
 
-const {data: statistics} = await useAsyncData('statistics', async () => {
+const {data: statistics, pending: statisticsPending } = await useLazyAsyncData('statistics', async () => {
   const {count: sessionsAmount, error: errorSessions} = await supabase.from('sessions')
       .select('*', {head:true, count: 'exact'})
       .eq('user_id', user.value.id)
@@ -79,8 +79,8 @@ const {data: statistics} = await useAsyncData('statistics', async () => {
       <div class="overflow-x-auto">
         <div class="flex gap-x-2 *:shrink-0">
 <!--          <StatCard title="Uren gereden" value="5,3" />-->
-          <StatCard title="Sessies" :value="statistics?.sessionsAmount" />
-          <StatCard title="Banen bezocht" :value="statistics?.tracksVisited" />
+          <StatCard title="Sessies" :value="statistics?.sessionsAmount" :loading="statisticsPending" />
+          <StatCard title="Banen bezocht" :value="statistics?.tracksVisited" :loading="statisticsPending" />
         </div>
       </div>
     </section>
@@ -99,7 +99,7 @@ const {data: statistics} = await useAsyncData('statistics', async () => {
           <SessionCard v-for="session in recentSessions" :session="session" :trackName="session.track_name" :trackLocation="session.track_location" />
         </template>
         <template v-else-if="pendingSessions">
-          <Skeleton v-for="i in 3" class="h-16 w-full"/>
+          <Skeleton v-for="i in 3" class="h-[4.875rem] w-full"/>
         </template>
         <p v-else class="text-muted-foreground text-sm">Geen sessies gevonden.</p>
       </div>

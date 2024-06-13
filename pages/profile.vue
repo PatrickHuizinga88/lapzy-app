@@ -24,11 +24,42 @@ const { data: profile, pending } = await useAsyncData('profile', async () => {
   }
 })
 
+const { data: tracks, pending: pendingTracks } = await useLazyAsyncData('tracks', async () => {
+  const { data, error } = await supabase
+      .from('tracks')
+      .select('id,name,location')
+      .order('location', {ascending: true})
+  if (error) throw error
+
+  return data.map((track: any) => ({
+    label: track.name || track.location,
+    value: track.id.toString()
+  }))
+})
+
+const { data: favoriteTracks } = await useAsyncData('favoriteTracks', async () => {
+  const { data: favoriteTrackIds, error: favoriteTracksError } = await supabase
+      .from('favorite_tracks')
+      .select('track_id')
+      .eq('profile_id', user.value.id)
+      .single()
+  if (favoriteTracksError) throw favoriteTracksError
+
+  const { data, error } = await supabase
+      .from('tracks')
+      .select('id,name,location')
+      .in('id', favoriteTrackIds.track_id)
+  if (error) throw error
+
+  return data.map((track: any) => track.id.toString())
+})
+
 const form = reactive({
   first_name: profile.value?.first_name || '',
   last_name: profile.value?.last_name || '',
   rider_number: profile.value?.rider_number || '',
-  theme:  profile.value?.theme || '220 76% 49%'
+  theme:  profile.value?.theme || '220 76% 49%',
+  favoriteTracks: favoriteTracks.value || [],
 })
 
 const themes = [
@@ -46,6 +77,10 @@ const themes = [
   },
 ]
 
+const setFavoriteTracks = (tracks: string[]) => {
+  form.favoriteTracks = tracks
+}
+
 const themeBackground = (theme: string) => {
   return {
     'bg-blue-600': theme === '220 76% 49%',
@@ -58,7 +93,7 @@ const onSubmit = async () => {
   if (!user.value) return
 
   try {
-    const { error } = await supabase
+    const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
           id: user.value.id,
@@ -67,7 +102,16 @@ const onSubmit = async () => {
           rider_number: parseInt(form.rider_number),
           theme: form.theme,
         })
-    if (error) throw error
+    if (profileError) throw profileError
+
+    const { error: favoriteTracksError } = await supabase
+        .from('favorite_tracks')
+        .upsert({
+          profile_id: user.value.id,
+          track_id: form.favoriteTracks,
+        }, { onConflict: 'profile_id' })
+    if (favoriteTracksError) throw favoriteTracksError
+
     location.reload()
   } catch (error) {
     console.error(error)
@@ -78,50 +122,63 @@ const onSubmit = async () => {
 
 <template>
   <h1 class="text-2xl font-bold mb-8">Mijn profiel</h1>
-  <form @submit.prevent="onSubmit" class="space-y-6">
-    <div>
-      <Label for="first_name">Voornaam</Label>
-      <Input
-          v-model="form.first_name"
-          id="first_name"
-          name="first_name"
-          type="text"
+  <form @submit.prevent="onSubmit" class="space-y-8">
+    <section id="profile-settings" class="space-y-6">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <Label for="first_name">Voornaam</Label>
+          <Input
+              v-model="form.first_name"
+              id="first_name"
+              name="first_name"
+              type="text"
           />
-    </div>
-    <div>
-      <Label for="last_name">Achternaam</Label>
-      <Input
-          v-model="form.last_name"
-          id="last_name"
-          name="last_name"
-          type="text"
+        </div>
+        <div>
+          <Label for="last_name">Achternaam</Label>
+          <Input
+              v-model="form.last_name"
+              id="last_name"
+              name="last_name"
+              type="text"
           />
-    </div>
-    <div>
-      <Label for="rider_number">Rijdersnummer</Label>
-      <Input
-          v-model="form.rider_number"
-          id="rider_number"
-          name="rider_number"
-          type="number"
-          class="w-24"
-          min="1"
-          max="9999"
-          />
-    </div>
-    <div>
-      <Label>Thema</Label>
-      <div class="flex gap-x-3">
-        <div v-for="theme in themes">
-          <input type="radio" :id="theme.value" name="condition" v-model="form.theme" :value="theme.value"
-                 class="hidden peer"/>
-          <Label
-              :for="theme.value"
-              :class="cn('inline-flex items-center justify-center size-8 border border-input rounded-full cursor-pointer peer-checked:outline-none peer-checked:ring-2 peer-checked:ring-ring peer-checked:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', themeBackground(theme.value))"
-          ></Label>
         </div>
       </div>
-    </div>
+      <div>
+        <Label for="rider_number">Rijdersnummer</Label>
+        <Input
+            v-model="form.rider_number"
+            id="rider_number"
+            name="rider_number"
+            type="number"
+            class="w-24"
+            min="1"
+            max="9999"
+        />
+      </div>
+    </section>
+
+    <section id="app-settings" class="space-y-6">
+      <h2 class="text-lg font-semibold">App instellingen</h2>
+      <div>
+        <Label class="block">Favoriete crossbanen</Label>
+        <MultiSelect v-if="tracks" :options="tracks" :selectedOptions="favoriteTracks ?? []" placeholder="Selecteer een crossbaan..." @itemToggled="setFavoriteTracks" />
+        <p v-else>Crossbanen ophalen mislukt.</p>
+      </div>
+      <div>
+        <Label>Thema</Label>
+        <div class="flex gap-x-3">
+          <div v-for="theme in themes">
+            <input type="radio" :id="theme.value" name="condition" v-model="form.theme" :value="theme.value"
+                   class="hidden peer"/>
+            <Label
+                :for="theme.value"
+                :class="cn('inline-flex items-center justify-center size-8 border border-input rounded-full cursor-pointer peer-checked:outline-none peer-checked:ring-2 peer-checked:ring-ring peer-checked:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', themeBackground(theme.value))"
+            ></Label>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <Button type="submit" class="w-full" :disabled="pending">
       Opslaan
