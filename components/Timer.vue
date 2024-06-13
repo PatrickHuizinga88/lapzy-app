@@ -111,8 +111,8 @@ onUnmounted(() => {
         <div class="grid grid-cols-2 gap-x-6">
           <Button v-if="!timerRunning && !totalTimeElapsed" size="xl" class="col-span-full" @click="start">Start</Button>
           <template v-else-if="timerRunning">
-            <Button variant="secondary" size="xl" @click="setLap">Ronde</Button>
             <Button variant="destructive" size="xl" @click="pause">Stop</Button>
+            <Button variant="secondary" size="xl" @click="setLap">Ronde</Button>
           </template>
           <template v-else-if="!timerRunning && totalTimeElapsed">
             <Dialog>
