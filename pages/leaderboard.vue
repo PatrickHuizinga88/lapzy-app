@@ -3,7 +3,7 @@ import type {Database} from "~/types/supabase";
 
 const supabase = useSupabaseClient<Database>()
 
-const { data: tracks } = await useAsyncData('tracks', async () => {
+const { data: tracks, pending } = await useLazyAsyncData('tracks', async () => {
   const { data, error } = await supabase
       .from('tracks')
       .select('id,name,location')
@@ -31,7 +31,7 @@ const { data: lapTimes } = await useAsyncData('fastestLap', async () => {
 
 <template>
   <h1 class="text-2xl sm:text-3xl font-semibold mb-6">Scorebord</h1>
-  <Select v-model="selectedTrack">
+  <Select v-model="selectedTrack" :disabled="pending">
     <SelectTrigger>
       <SelectValue placeholder="Selecteer een baan" />
     </SelectTrigger>

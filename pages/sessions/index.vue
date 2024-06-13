@@ -4,7 +4,7 @@ import {Skeleton} from "~/components/ui/skeleton";
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-const {data: sessions, pending: pending} = useAsyncData('sessions', async () => {
+const {data: sessions, pending: pending} = useLazyAsyncData('sessions', async () => {
   if (!user.value) {
     navigateTo('/login')
     return
@@ -32,7 +32,7 @@ const {data: sessions, pending: pending} = useAsyncData('sessions', async () => 
   <div class="space-y-2">
     <SessionCard v-if="!pending && sessions?.length" v-for="session in sessions" :key="session.id" :session="session" :trackName="session.track_name" :trackLocation="session.track_location"/>
     <template v-else-if="pending">
-      <Skeleton v-for="i in 4" class="h-16 w-full"/>
+      <Skeleton v-for="i in 4" class="h-[4.875rem] w-full"/>
     </template>
     <p v-else class="text-muted-foreground text-sm">Geen sessies gevonden.</p>
   </div>
