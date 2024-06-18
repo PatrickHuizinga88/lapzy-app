@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import {Skeleton} from "~/components/ui/skeleton";
 
+useSeoMeta({
+  title: 'Sessies - Lapzy',
+  description: 'Inzicht in al je sessies.'
+})
+
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 

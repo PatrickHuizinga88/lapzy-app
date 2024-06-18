@@ -6,6 +6,11 @@ definePageMeta({
   layout: 'auth'
 })
 
+useSeoMeta({
+  title: 'Registreren - Lapzy',
+  description: 'Maak eenvoudig een account aan om te beginnen.'
+})
+
 const supabase = useSupabaseClient()
 
 const form = reactive({
