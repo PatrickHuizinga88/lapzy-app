@@ -16,7 +16,7 @@ const {data: session} = await useAsyncData('session', async () => {
 
     const { data: track } = await supabase
         .from('tracks')
-        .select('name')
+        .select('name, location')
         .eq('id', sessionDetails.track_id)
         .single()
 
@@ -54,7 +54,7 @@ const trackCondition = computed(() => {
 })
 
 useSeoMeta({
-  title: `Je sessie in ${session.value?.track?.name} - Lapzy`,
+  title: `Je sessie in ${session.value?.track?.name || session.value?.track?.location} - Lapzy`,
   description: 'Bekijk je sessie terug.'
 })
 </script>
@@ -66,34 +66,40 @@ useSeoMeta({
   </Button>
 
   <div class="space-y-12 text-center">
-    <div>
-      <h1 class="text-lg">Je sessie in <span class="block text-3xl font-semibold my-2">{{ session?.track.name }}</span></h1>
-      <p class="text-muted-foreground">{{ $dayjs(session?.created_at).format('DD-MM-YYYY') }}</p>
-    </div>
-
-    <section id="stats" class="space-y-3">
-      <StatCard class="w-full" title="Snelste ronde" :value="fastestLapTime" />
-
-      <div class="grid grid-cols-2 gap-3">
-        <StatCard class="w-full" title="Totale duur" :value="session?.duration" />
-        <StatCard class="w-full" title="Baanconditie" :value="trackCondition" />
+    <template v-if="session">
+      <div>
+        <h1 class="text-lg">Je sessie in <span class="block text-3xl font-semibold my-2">{{ session.track.name || session.track.location }}</span></h1>
+        <p class="text-muted-foreground">{{ $dayjs(session?.created_at).format('DD-MM-YYYY') }}</p>
       </div>
-    </section>
 
-    <section id="lap-times">
-      <h2 class="text-xl font-semibold mb-4">Rondetijden</h2>
-      <ol class="space-y-3">
-        <li v-for="(lap, index) in session?.laps" class="flex items-center justify-between">
-          <span class="inline-flex items-center justify-center bg-primary/15 font-medium rounded text-primary size-6 mr-2">{{ index + 1 }}</span>
-          {{ lap.time }}
-        </li>
-      </ol>
-    </section>
+      <section id="stats" class="space-y-3">
+        <StatCard class="w-full" title="Snelste ronde" :value="fastestLapTime" />
 
-    <section id="note">
-      <h2 class="text-xl font-semibold mb-4">Notitie</h2>
-      <p class="text-sm text-muted-foreground">{{ session?.note || 'Geen notitie toegevoegd' }}</p>
-    </section>
+        <div class="grid grid-cols-2 gap-3">
+          <StatCard class="w-full" title="Totale duur" :value="session.duration" />
+          <StatCard class="w-full" title="Baanconditie" :value="trackCondition" />
+        </div>
+      </section>
+
+      <section id="lap-times">
+        <h2 class="text-xl font-semibold mb-4">Rondetijden</h2>
+        <ol class="space-y-3">
+          <li v-for="(lap, index) in session?.laps" class="flex items-center justify-between">
+            <span class="inline-flex items-center justify-center bg-primary/15 font-medium rounded text-primary size-6 mr-2">{{ index + 1 }}</span>
+            {{ lap.time }}
+          </li>
+        </ol>
+      </section>
+
+      <section id="note">
+        <h2 class="text-xl font-semibold mb-4">Notitie</h2>
+        <p class="text-sm text-muted-foreground">{{ session?.note || 'Geen notitie toegevoegd' }}</p>
+      </section>
+    </template>
+
+    <div v-else>
+      <h1 class="text-lg">Sessie ophalen mislukt</h1>
+    </div>
   </div>
 </template>
 
