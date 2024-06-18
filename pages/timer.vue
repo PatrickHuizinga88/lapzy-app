@@ -5,6 +5,11 @@ import Timer from "~/components/Timer.vue";
 import type {Lap} from "~/types";
 import { useWakeLock } from '@vueuse/core'
 
+useSeoMeta({
+  title: 'Stopwatch - Lapzy',
+  description: 'Leg jouw rondetijden eenvoudig vast.'
+})
+
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 

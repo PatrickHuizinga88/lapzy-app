@@ -2,6 +2,11 @@
 import type {Database} from "~/types/supabase";
 import {Loader2} from "lucide-vue-next";
 
+useSeoMeta({
+  title: 'Profiel - Lapzy',
+  description: 'Pas je profiel en app instellingen aan.'
+})
+
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type {Database} from "~/types/supabase";
 
+useSeoMeta({
+  title: 'Scorebord - Lapzy',
+  description: 'Vergelijk jouw rondetijden met die van anderen.'
+})
+
 const supabase = useSupabaseClient<Database>()
 
 const { data: tracks, pending } = await useLazyAsyncData('tracks', async () => {

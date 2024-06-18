@@ -52,6 +52,11 @@ const trackCondition = computed(() => {
       return 'Ingereden'
   }
 })
+
+useSeoMeta({
+  title: `Je sessie in ${session.value?.track?.name} - Lapzy`,
+  description: 'Bekijk je sessie terug.'
+})
 </script>
 
 <template>

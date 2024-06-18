@@ -4,6 +4,11 @@ import type { Database } from "~/types/supabase";
 import { Play } from 'lucide-vue-next'
 import dayjs from "dayjs";
 
+useSeoMeta({
+  title: 'Dashboard - Lapzy',
+  description: 'Overzicht van jouw laatste activiteit.'
+})
+
 const user = useSupabaseUser()
 const supabase = useSupabaseClient<Database>()
 
