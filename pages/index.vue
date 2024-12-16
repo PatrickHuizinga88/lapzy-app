@@ -77,8 +77,7 @@ const {data: profile} = await useLazyAsyncData('profile', async () => {
     <section>
       <h2 class="font-semibold mb-3">Jouw afgelopen maand</h2>
       <div v-if="statistics" class="overflow-x-auto">
-        <div class="flex gap-x-2 *:shrink-0">
-          <!--          <StatCard title="Uren gereden" value="5,3" />-->
+        <div class="flex gap-x-3 *:shrink-0">
           <StatCard v-if="statistics.sessionsAmount" title="Sessies" :value="statistics?.sessionsAmount" :loading="statisticsStatus === 'pending'"/>
           <StatCard v-if="statistics.tracksVisited" title="Banen bezocht" :value="statistics?.tracksVisited" :loading="statisticsStatus === 'pending'"/>
         </div>

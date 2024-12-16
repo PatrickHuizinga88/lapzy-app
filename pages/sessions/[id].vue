@@ -57,6 +57,18 @@ const trackCondition = computed(() => {
   }
 })
 
+const conditionBadgeClasses = computed(() => {
+  if (!session.value) return
+  switch (session.value.condition) {
+    case 'GOOD':
+      return 'bg-success/10 text-success border-success'
+    case 'HEAVY':
+      return 'bg-destructive/10 text-destructive border-destructive'
+    case 'MEDIUM':
+      return 'bg-warning/10 text-warning border-warning'
+  }
+})
+
 useSeoMeta({
   title: `Je sessie in ${session.value?.track?.name || session.value?.track?.location} - Lapzy`,
   description: 'Bekijk je sessie terug.'
@@ -69,28 +81,29 @@ useSeoMeta({
     Terug
   </Button>
 
-  <div class="space-y-12 text-center">
+  <div class="space-y-10">
     <template v-if="session">
       <div>
-        <h1 class="text-lg">Je sessie in <span class="block text-3xl font-semibold my-2">{{ session.track.name || session.track.location }}</span></h1>
-        <p class="text-muted-foreground">{{ $dayjs(session?.created_at).format('DD-MM-YYYY') }}</p>
+        <h1 class="text-lg">Je sessie in <span class="block text-3xl font-semibold">{{ session.track.name || session.track.location }}</span></h1>
+        <div class="flex items-center mt-2">
+          <p class="text-muted-foreground">{{ $dayjs(session?.created_at).format('DD-MM-YYYY') }}</p>
+          <div :class="['flex items-center h-6 text-xs border font-medium rounded px-1.5 ml-2', conditionBadgeClasses]">{{ trackCondition }}</div>
+        </div>
       </div>
 
       <section id="stats" class="space-y-3">
-        <StatCard class="w-full" title="Snelste ronde" :value="fastestLapTime" />
-
         <div class="grid grid-cols-2 gap-3">
           <StatCard class="w-full" title="Totale duur" :value="session.duration" />
-          <StatCard class="w-full" title="Baanconditie" :value="trackCondition" />
+          <StatCard class="w-full" title="Snelste ronde" :value="fastestLapTime" />
         </div>
       </section>
 
       <section id="lap-times">
         <h2 class="text-xl font-semibold mb-4">Rondetijden</h2>
         <ol class="space-y-3">
-          <li v-for="(lap, index) in session?.laps" class="flex items-center justify-between">
-            <span class="inline-flex items-center justify-center bg-primary/15 font-medium rounded text-primary size-6 mr-2">{{ index + 1 }}</span>
-            {{ lap.time }}
+          <li v-for="(lap, index) in session?.laps" class="flex items-center justify-between gap-2">
+            <span class="inline-flex items-center justify-center bg-muted font-medium rounded text-muted-foreground size-6">{{ index + 1 }}</span>
+            <span class="tabular-nums">{{ lap.time }}</span>
           </li>
         </ol>
       </section>
