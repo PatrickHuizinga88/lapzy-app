@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+
   app: {
     head: {
       title: 'App',
@@ -22,13 +23,16 @@ export default defineNuxtConfig({
       ],
     },
   },
+
   css: [
     '~/assets/css/main.css',
     '~/assets/css/tailwind.css',
   ],
+
   runtimeConfig:{
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
   },
+
   modules: [
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
@@ -36,10 +40,14 @@ export default defineNuxtConfig({
     'dayjs-nuxt',
     '@vueuse/nuxt',
   ],
+
   supabase: {
     redirect: false
   },
+
   shadcn: {
     componentDir: './components/ui'
-  }
+  },
+
+  compatibilityDate: '2024-12-16'
 })

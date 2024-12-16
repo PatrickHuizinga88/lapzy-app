@@ -1,3 +1,19 @@
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../fonts/Inter.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Tomorrow';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/Tomorrow-Bold.ttf') format('truetype');
+}
+
 .lucide {
     stroke-width: 1.5px;
 }
