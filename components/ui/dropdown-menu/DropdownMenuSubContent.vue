@@ -6,7 +6,6 @@ import {
   type DropdownMenuSubContentProps,
   useForwardPropsEmits,
 } from 'radix-vue'
-import { cn } from '@/utils'
 
 const props = defineProps<DropdownMenuSubContentProps & { class?: HTMLAttributes['class'] }>()
 const emits = defineEmits<DropdownMenuSubContentEmits>()

@@ -10,6 +10,10 @@ useSeoMeta({
   description: 'Leg jouw rondetijden eenvoudig vast.'
 })
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 
@@ -23,7 +27,7 @@ const { request } = useWakeLock()
 
 request("screen")
 
-const { data: track, pending: pendingTrack } = await useAsyncData('track', async () => {
+const { data: track, status: trackStatus } = await useAsyncData('track', async () => {
   if (!track_id) return
   const {data} = await supabase.from('tracks')
       .select('name,location')
@@ -33,11 +37,6 @@ const { data: track, pending: pendingTrack } = await useAsyncData('track', async
 })
 
 const saveSession = async (laps: Lap[], duration: string, note: string) => {
-  if (!user.value) {
-    navigateTo('/login')
-    return
-  }
-
   try {
     const { data: session, error: sessionError } = await supabase.from('sessions').insert({
       track_id: parseInt(track_id),
@@ -66,8 +65,8 @@ const saveSession = async (laps: Lap[], duration: string, note: string) => {
 <template>
   <div class="flex flex-col h-full">
     <section v-if="track" class="flex flex-col items-center justify-center text-center h-32 shrink-0 space-y-1">
-      <h1 v-if="!pendingTrack" class="text-2xl">{{ track?.name || track?.location }}</h1>
-      <Skeleton v-if="pendingTrack" class="h-8 w-40" />
+      <h1 v-if="trackStatus !== 'pending'" class="text-2xl">{{ track?.name || track?.location }}</h1>
+      <Skeleton v-if="trackStatus === 'pending'" class="h-8 w-40" />
 <!--      <div v-if="fastestLap" class="flex items-center justify-center gap-x-2 text-muted-foreground text-lg">-->
 <!--        <Trophy class="size-5"/>-->
 <!--        {{ fastestLap }}-->

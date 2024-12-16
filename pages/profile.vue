@@ -7,17 +7,16 @@ useSeoMeta({
   description: 'Pas je profiel en app instellingen aan.'
 })
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 
-const { data: profile, pending } = await useAsyncData('profile', async () => {
-  if (!user.value) {
-    navigateTo('/login')
-    return
-  }
-
+const {data: profile, status} = await useAsyncData('profile', async () => {
   try {
-    const { data, error } = await supabase
+    const {data, error} = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.value.id)
@@ -29,8 +28,8 @@ const { data: profile, pending } = await useAsyncData('profile', async () => {
   }
 })
 
-const { data: tracks, pending: pendingTracks } = await useLazyAsyncData('tracks', async () => {
-  const { data, error } = await supabase
+const {data: tracks} = await useLazyAsyncData('tracks', async () => {
+  const {data, error} = await supabase
       .from('tracks')
       .select('id,name,location')
       .order('location', {ascending: true})
@@ -42,15 +41,15 @@ const { data: tracks, pending: pendingTracks } = await useLazyAsyncData('tracks'
   }))
 })
 
-const { data: favoriteTracks } = await useAsyncData('favoriteTracks', async () => {
-  const { data: favoriteTrackIds, error: favoriteTracksError } = await supabase
+const {data: favoriteTracks} = await useAsyncData('favoriteTracks', async () => {
+  const {data: favoriteTrackIds, error: favoriteTracksError} = await supabase
       .from('favorite_tracks')
       .select('track_id')
       .eq('profile_id', user.value.id)
       .single()
   if (favoriteTracksError) throw favoriteTracksError
 
-  const { data, error } = await supabase
+  const {data, error} = await supabase
       .from('tracks')
       .select('id,name,location')
       .in('id', favoriteTrackIds.track_id)
@@ -63,7 +62,7 @@ const form = reactive({
   first_name: profile.value?.first_name || '',
   last_name: profile.value?.last_name || '',
   rider_number: profile.value?.rider_number || '',
-  theme:  profile.value?.theme || '220 76% 49%',
+  theme: profile.value?.theme || '220 76% 49%',
   favoriteTracks: favoriteTracks.value || [],
 })
 
@@ -98,7 +97,7 @@ const onSubmit = async () => {
   if (!user.value) return
 
   try {
-    const { error: profileError } = await supabase
+    const {error: profileError} = await supabase
         .from('profiles')
         .upsert({
           id: user.value.id,
@@ -109,12 +108,12 @@ const onSubmit = async () => {
         })
     if (profileError) throw profileError
 
-    const { error: favoriteTracksError } = await supabase
+    const {error: favoriteTracksError} = await supabase
         .from('favorite_tracks')
         .upsert({
           profile_id: user.value.id,
           track_id: form.favoriteTracks,
-        }, { onConflict: 'profile_id' })
+        }, {onConflict: 'profile_id'})
     if (favoriteTracksError) throw favoriteTracksError
 
     location.reload()
@@ -167,7 +166,8 @@ const onSubmit = async () => {
       <h2 class="text-lg font-semibold">App instellingen</h2>
       <div>
         <Label class="block">Favoriete crossbanen</Label>
-        <MultiSelect v-if="tracks" :options="tracks" :selectedOptions="favoriteTracks ?? []" placeholder="Selecteer een crossbaan..." @itemToggled="setFavoriteTracks" />
+        <MultiSelect v-if="tracks" :options="tracks" :selectedOptions="favoriteTracks ?? []"
+                     placeholder="Selecteer een crossbaan..." @itemToggled="setFavoriteTracks"/>
         <p v-else>Crossbanen ophalen mislukt.</p>
       </div>
       <div>
@@ -185,9 +185,9 @@ const onSubmit = async () => {
       </div>
     </section>
 
-    <Button type="submit" class="w-full" :disabled="pending">
+    <Button type="submit" class="w-full" :disabled="status === 'pending'">
       Opslaan
-      <Loader2 v-if="pending" class="size-5 ml-2 animate-spin"/>
+      <Loader2 v-if="status === 'pending'" class="size-5 ml-2 animate-spin"/>
     </Button>
   </form>
 </template>
