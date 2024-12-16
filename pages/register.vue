@@ -85,11 +85,11 @@ const signUp = async () => {
 
         <div>
           <Button type="submit" :disabled="loading" class="w-full">
-            Registreren
-            <div v-if="loading" role="status" class="ml-2">
+            <div v-if="loading" role="status" class="mr-2">
               <Loader2 class="size-5 animate-spin"/>
               <span class="sr-only">Aan het laden...</span>
             </div>
+            Registreren
           </Button>
         </div>
 

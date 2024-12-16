@@ -148,10 +148,10 @@ const handleSubmit = () => {
 <!--              <Star class="size-5 text-yellow-400"/>-->
 <!--            </label>-->
 <!--          </div>-->
-          <Button @click="getLocation" type="button" variant="secondary">
+          <Button @click="getLocation" type="button" variant="secondary" :disabled="loadingLocation">
+            <Loader2 v-if="loadingLocation" class="size-5 mr-2 animate-spin" />
+            <MapPin v-else class="size-5 mr-2" />
             Locatie ophalen
-            <Loader2 v-if="loadingLocation" class="size-5 ml-2 animate-spin" />
-            <MapPin v-else class="size-5 ml-2" />
           </Button>
 
           <p v-if="locationError" class="text-red-500 text-sm">{{ locationError }}</p>
