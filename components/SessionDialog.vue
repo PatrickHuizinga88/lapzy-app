@@ -6,25 +6,7 @@ import {useGeolocation} from "@vueuse/core";
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 
-const featuredTracks = [
-  {
-    id: 1,
-    name: "MCO Oirschot",
-    location: "Oirschot"
-  },
-  {
-    id: 2,
-    name: "MAC Budel",
-    location: "Budel"
-  },
-  {
-    id: 4,
-    name: "De Landsard",
-    location: "Veldhoven"
-  },
-]
-
-const { data: favoriteTracks } = await useLazyAsyncData('favoriteTracks', async () => {
+const { data: favoriteTracks } = await useAsyncData('favoriteTracks', async () => {
   const { data: favoriteTrackIds, error: favoriteTracksError } = await supabase
       .from('favorite_tracks')
       .select('track_id')
@@ -41,7 +23,7 @@ const { data: favoriteTracks } = await useLazyAsyncData('favoriteTracks', async 
   return data
 })
 
-const { data: filteredTracks } = useLazyAsyncData('filteredTracks', async () => {
+const { data: filteredTracks } = useAsyncData('filteredTracks', async () => {
   const { data, error } = await supabase
       .from('tracks')
       .select('id, name, location')

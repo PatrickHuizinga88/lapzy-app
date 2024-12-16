@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import StatCard from "~/components/StatCard.vue";
-import type { Database } from "~/types/supabase";
-import { Play } from 'lucide-vue-next'
+import type {Database} from "~/types/supabase";
+import {Play} from 'lucide-vue-next'
 import dayjs from "dayjs";
 
 useSeoMeta({
@@ -9,50 +9,16 @@ useSeoMeta({
   description: 'Overzicht van jouw laatste activiteit.'
 })
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const user = useSupabaseUser()
 const supabase = useSupabaseClient<Database>()
 
-const {data: recentSessions, pending: pendingSessions} = await useLazyAsyncData('recentSessions', async () => {
-  if (!user.value) {
-    navigateTo('/login')
-    return
-  }
-
-  const {data} = await supabase.from('sessions')
-      .select('id,track_id,duration,note,created_at')
-      .eq('user_id', user.value.id)
-      .order('created_at', {ascending: false})
-      .limit(3)
-
-  if (!data) return []
-
-  return await Promise.all(data.map(async session => {
-    const { data: track, error } = await supabase.from('tracks')
-        .select('name,location')
-        .eq('id', session.track_id)
-        .single()
-    if (error) throw error
-    return {...session, track_name: track.name, track_location: track.location}
-  }))
-})
-
-const {data: profile} = await useLazyAsyncData('profile', async () => {
-  if (!user.value) {
-    navigateTo('/login')
-    return
-  }
-
-  const {data, error} = await supabase.from('profiles')
-      .select('*')
-      .eq('id', user.value.id)
-      .single()
-  if (error) throw error
-  return data
-})
-
-const {data: statistics, pending: statisticsPending } = await useLazyAsyncData('statistics', async () => {
+const {data: statistics, status: statisticsStatus} = await useLazyAsyncData('statistics', async () => {
   const {count: sessionsAmount, error: errorSessions} = await supabase.from('sessions')
-      .select('*', {head:true, count: 'exact'})
+      .select('*', {head: true, count: 'exact'})
       .eq('user_id', user.value.id)
       .gte('created_at', dayjs().subtract(1, 'month'))
   if (errorSessions) throw errorSessions
@@ -71,23 +37,53 @@ const {data: statistics, pending: statisticsPending } = await useLazyAsyncData('
     tracksVisited: uniqueTracksVisited.length
   }
 })
+
+const {data: recentSessions, status: recentSessionsStatus} = await useLazyAsyncData('recentSessions', async () => {
+  if (!user.value) return []
+  const {data} = await supabase.from('sessions')
+      .select('id,track_id,duration,note,created_at')
+      .eq('user_id', user.value.id)
+      .order('created_at', {ascending: false})
+      .limit(3)
+
+  if (!data) return []
+
+  return await Promise.all(data.map(async session => {
+    const {data: track, error} = await supabase.from('tracks')
+        .select('name,location')
+        .eq('id', session.track_id)
+        .single()
+    if (error) throw error
+    return {...session, track_name: track.name, track_location: track.location}
+  }))
+})
+
+const {data: profile} = await useLazyAsyncData('profile', async () => {
+  const {data, error} = await supabase.from('profiles')
+      .select('*')
+      .eq('id', user.value.id)
+      .single()
+  if (error) throw error
+  return data
+})
 </script>
 
 <template>
   <div class="space-y-6">
     <h1 class="text-2xl sm:text-3xl font-semibold">
-      Welkom terug<template v-if="profile?.first_name">, {{profile.first_name}}</template>!
+      Welkom terug<template v-if="profile?.first_name">, {{ profile.first_name }}</template>!
     </h1>
 
     <section>
       <h2 class="font-semibold mb-3">Jouw afgelopen maand</h2>
-      <div class="overflow-x-auto">
+      <div v-if="statistics" class="overflow-x-auto">
         <div class="flex gap-x-2 *:shrink-0">
-<!--          <StatCard title="Uren gereden" value="5,3" />-->
-          <StatCard title="Sessies" :value="statistics?.sessionsAmount" :loading="statisticsPending" />
-          <StatCard title="Banen bezocht" :value="statistics?.tracksVisited" :loading="statisticsPending" />
+          <!--          <StatCard title="Uren gereden" value="5,3" />-->
+          <StatCard v-if="statistics.sessionsAmount" title="Sessies" :value="statistics?.sessionsAmount" :loading="statisticsStatus === 'pending'"/>
+          <StatCard v-if="statistics.tracksVisited" title="Banen bezocht" :value="statistics?.tracksVisited" :loading="statisticsStatus === 'pending'"/>
         </div>
       </div>
+      <p v-else class="text-sm text-muted-foreground">Statistieken ophalen mislukt</p>
     </section>
 
     <section>
@@ -101,9 +97,10 @@ const {data: statistics, pending: statisticsPending } = await useLazyAsyncData('
       </div>
       <div class="space-y-2">
         <template v-if="recentSessions && recentSessions.length">
-          <SessionCard v-for="session in recentSessions" :session="session" :trackName="session.track_name" :trackLocation="session.track_location" />
+          <SessionCard v-for="session in recentSessions" :session="session" :trackName="session.track_name"
+                       :trackLocation="session.track_location"/>
         </template>
-        <template v-else-if="pendingSessions">
+        <template v-else-if="recentSessionsStatus === 'pending'">
           <Skeleton v-for="i in 3" class="h-[4.875rem] w-full"/>
         </template>
         <p v-else class="text-muted-foreground text-sm">Geen sessies gevonden.</p>

@@ -2,6 +2,10 @@
 import type {Database} from "~/types/supabase";
 import { ArrowLeft } from 'lucide-vue-next';
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const { id } = useRoute().params
 const supabase = useSupabaseClient<Database>()
 

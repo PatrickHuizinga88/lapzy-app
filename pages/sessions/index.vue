@@ -6,14 +6,14 @@ useSeoMeta({
   description: 'Inzicht in al je sessies.'
 })
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-const {data: sessions, pending: pending} = useLazyAsyncData('sessions', async () => {
-  if (!user.value) {
-    navigateTo('/login')
-    return
-  }
+const {data: sessions, status} = useLazyAsyncData('sessions', async () => {
   const {data} = await supabase.from('sessions')
       .select('id,track_id,duration,note,created_at')
       .eq('user_id', user.value.id)
@@ -35,8 +35,8 @@ const {data: sessions, pending: pending} = useLazyAsyncData('sessions', async ()
 <template>
   <h1 class="text-2xl sm:text-3xl font-semibold mb-6">Jouw sessies</h1>
   <div class="space-y-2">
-    <SessionCard v-if="!pending && sessions?.length" v-for="session in sessions" :key="session.id" :session="session" :trackName="session.track_name" :trackLocation="session.track_location"/>
-    <template v-else-if="pending">
+    <SessionCard v-if="status !== 'pending' && sessions?.length" v-for="session in sessions" :key="session.id" :session="session" :trackName="session.track_name" :trackLocation="session.track_location"/>
+    <template v-else-if="status === 'pending'">
       <Skeleton v-for="i in 4" class="h-[4.875rem] w-full"/>
     </template>
     <p v-else class="text-muted-foreground text-sm">Geen sessies gevonden.</p>

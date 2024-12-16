@@ -3,11 +3,18 @@ const props = defineProps<{
   theme?: string
 }>()
 
+const theme = ref(localStorage.getItem('theme') || null)
+
 const applyTheme = () => {
-  if (!props.theme) return
-  localStorage.setItem('theme', props.theme)
-  document.documentElement.style.setProperty('--primary', props.theme)
-  document.documentElement.style.setProperty('--ring', props.theme)
+  if (props.theme) {
+    theme.value = props.theme
+    localStorage.setItem('theme', props.theme)
+  }
+
+  if (!theme.value) return
+
+  document.documentElement.style.setProperty('--primary', theme.value)
+  document.documentElement.style.setProperty('--ring', theme.value)
 }
 
 onMounted(() => {
