@@ -104,13 +104,13 @@ const leave = () => {
       </div>
     </div>
   </header>
-  <main class="h-[calc(100svh-var(--header-height)-var(--navbar-height))] overflow-auto">
-    <div class="h-full py-8">
-      <div class="h-full container">
+  <main class="flex flex-col h-[calc(100svh-var(--header-height))]">
+    <div class="flex-1 overflow-auto py-6">
+      <div class="container">
         <slot/>
       </div>
     </div>
-    <div class="fixed bottom-0 left-0 z-50 w-full h-[var(--navbar-height)] bg-background border-t border-border">
+    <div class="shrink-0 w-full h-[var(--navbar-height)] bg-background border-t border-border">
       <div class="grid grid-cols-3 h-full max-w-lg mx-auto font-medium text-xs">
         <component :is="componentToShow"
                    @click="currentPath === '/timer' && confirmNavigation('/')"

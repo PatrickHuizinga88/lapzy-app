@@ -109,8 +109,8 @@ const {data: profile} = await useLazyAsyncData('profile', async () => {
 
     <SessionDialog>
       <Button size="xl" class="w-full">
+        <Play class="size-5 mr-2"/>
         Start nieuwe sessie
-        <Play class="size-5 ml-2.5"/>
       </Button>
     </SessionDialog>
   </div>
