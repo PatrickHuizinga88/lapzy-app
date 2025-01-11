@@ -57,6 +57,7 @@ const coordinates = ref(null)
 const loadingLocation = ref(false)
 
 const getLocation = async () => {
+  locationError.value = ''
   loadingLocation.value = true
 
   try {
@@ -90,7 +91,7 @@ const { execute } = await useAsyncData('nearbyTrack', async () => {
   }).limit(1).single()
   if (error) throw error
   if (data.dist_meters > 1000) {
-    locationError.value = 'Geen baan gevonden in de buurt'
+    locationError.value = 'Geen baan gevonden in de buurt. Graag handmatig selecteren'
     if (trackSelect.value) trackSelect.value.focus()
     return
   }
