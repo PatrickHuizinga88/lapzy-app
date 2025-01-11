@@ -78,8 +78,8 @@ const {data: profile} = await useLazyAsyncData('profile', async () => {
       <h2 class="font-semibold mb-3">Jouw afgelopen maand</h2>
       <div v-if="statistics" class="overflow-x-auto">
         <div class="flex gap-x-3 *:shrink-0">
-          <StatCard v-if="statistics.sessionsAmount" title="Sessies" :value="statistics?.sessionsAmount" :loading="statisticsStatus === 'pending'"/>
-          <StatCard v-if="statistics.tracksVisited" title="Banen bezocht" :value="statistics?.tracksVisited" :loading="statisticsStatus === 'pending'"/>
+          <StatCard v-if="typeof statistics.sessionsAmount === 'number'" title="Sessies" :value="statistics?.sessionsAmount" :loading="statisticsStatus === 'pending'"/>
+          <StatCard v-if="typeof statistics.tracksVisited === 'number'" title="Banen bezocht" :value="statistics?.tracksVisited" :loading="statisticsStatus === 'pending'"/>
         </div>
       </div>
       <p v-else class="text-sm text-muted-foreground">Statistieken ophalen mislukt</p>
