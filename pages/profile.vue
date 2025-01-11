@@ -7,19 +7,18 @@ useSeoMeta({
   description: 'Pas je profiel en app instellingen aan.'
 })
 
-definePageMeta({
-  middleware: 'auth'
-})
-
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
+const notificationStore = useNotificationStore()
 
-const {data: profile, status} = await useAsyncData('profile', async () => {
+const loading = ref(false)
+
+const {data: profile} = await useAsyncData('profile', async () => {
   try {
     const {data, error} = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.value.id)
+        .eq('id', user.value?.id)
         .single()
     if (error) throw error
     return data
@@ -45,7 +44,7 @@ const {data: favoriteTracks} = await useAsyncData('favoriteTracks', async () => 
   const {data: favoriteTrackIds, error: favoriteTracksError} = await supabase
       .from('favorite_tracks')
       .select('track_id')
-      .eq('profile_id', user.value.id)
+      .eq('profile_id', user.value?.id)
       .single()
   if (favoriteTracksError) throw favoriteTracksError
 
@@ -79,6 +78,10 @@ const themes = [
     name: 'Groen',
     value: '94 65% 45%'
   },
+  {
+    name: 'Rood',
+    value: '0 100% 40%'
+  }
 ]
 
 const setFavoriteTracks = (tracks: string[]) => {
@@ -90,6 +93,7 @@ const themeBackground = (theme: string) => {
     'bg-blue-600': theme === '220 76% 49%',
     'bg-orange-500': theme === '22 100% 50%',
     'bg-lime-500': theme === '94 65% 45%',
+    'bg-red-600': theme === '0 100% 40%',
   }
 }
 
@@ -97,6 +101,7 @@ const onSubmit = async () => {
   if (!user.value) return
 
   try {
+    loading.value = true
     const {error: profileError} = await supabase
         .from('profiles')
         .upsert({
@@ -115,11 +120,21 @@ const onSubmit = async () => {
           track_id: form.favoriteTracks,
         }, {onConflict: 'profile_id'})
     if (favoriteTracksError) throw favoriteTracksError
-
-    location.reload()
+    applyTheme(form.theme)
+    notificationStore.createNotification({
+      type: 'success',
+      action: 'save',
+      item: 'Profiel',
+    })
   } catch (error) {
     console.error(error)
-    alert('Profiel opslaan mislukt, probeer het later opnieuw')
+    notificationStore.createNotification({
+      type: 'destructive',
+      action: 'save',
+      item: 'Profiel',
+    })
+  } finally {
+    loading.value = false
   }
 }
 </script>
@@ -185,9 +200,9 @@ const onSubmit = async () => {
       </div>
     </section>
 
-    <Button type="submit" class="w-full" :disabled="status === 'pending'">
+    <Button type="submit" class="w-full" :disabled="loading">
+      <Loader2 v-if="loading" class="size-5 mr-2 animate-spin"/>
       Opslaan
-      <Loader2 v-if="status === 'pending'" class="size-5 ml-2 animate-spin"/>
     </Button>
   </form>
 </template>

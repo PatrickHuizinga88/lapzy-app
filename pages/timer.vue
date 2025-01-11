@@ -16,6 +16,7 @@ definePageMeta({
 
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
+const notificationStore = useNotificationStore()
 
 const { track_id, condition } = useRoute().query
 
@@ -52,11 +53,19 @@ const saveSession = async (laps: Lap[], duration: string, note: string) => {
       time: lap.time,
     })))
     if (lapsError) throw lapsError
-
+    notificationStore.createNotification({
+      type: 'success',
+      action: 'save',
+      item: 'Sessie',
+    })
     navigateTo('/sessions')
   } catch (error) {
     console.error(error)
-    alert('Sessie kan niet worden opgeslagen.')
+    notificationStore.createNotification({
+      type: 'destructive',
+      action: 'save',
+      item: 'Sessie',
+    })
   }
 }
 

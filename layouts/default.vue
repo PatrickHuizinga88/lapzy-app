@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import {User, Home, Timer, Calendar, LogOut} from 'lucide-vue-next'
 import type {Database} from "~/types/supabase";
+import {NotificationList} from "~/components/ui/notification";
 
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
+const notificationStore = useNotificationStore()
 
 const open = ref(false)
 const newLocation = ref('')
@@ -61,7 +63,7 @@ const leave = () => {
 </script>
 
 <template>
-  <NuxtLoadingIndicator :color="`hsl(${profile?.theme})`" />
+  <NuxtLoadingIndicator color="hsl(var(--primary))" />
   <ClientOnly>
     <ThemeProvider :theme="profile?.theme" />
   </ClientOnly>
@@ -150,6 +152,9 @@ const leave = () => {
       </DialogFooter>
     </DialogContent>
   </Dialog>
+
+  <NotificationList :notifications="notificationStore.notifications" />
+
 </template>
 
 <style>

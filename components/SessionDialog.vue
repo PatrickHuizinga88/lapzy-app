@@ -29,6 +29,7 @@ const { data: filteredTracks } = useAsyncData('filteredTracks', async () => {
       .select('id, name, location')
       .order('location', {ascending: true})
   if (error) throw error
+  if (!favoriteTracks.value) return data
   return data.filter(track => !favoriteTracks.value.some(featuredTrack => featuredTrack.id === track.id))
 })
 
@@ -91,7 +92,7 @@ const { execute } = await useAsyncData('nearbyTrack', async () => {
   }).limit(1).single()
   if (error) throw error
   if (data.dist_meters > 1000) {
-    locationError.value = 'Geen baan gevonden in de buurt. Graag handmatig selecteren'
+    locationError.value = 'Geen baan gevonden in de buurt. Selecteer handmatig.'
     if (trackSelect.value) trackSelect.value.focus()
     return
   }
@@ -150,19 +151,19 @@ const handleSubmit = () => {
 <!--            </label>-->
 <!--          </div>-->
           <Button @click="getLocation" type="button" variant="secondary" :disabled="loadingLocation">
-            <Loader2 v-if="loadingLocation" class="size-5 mr-2 animate-spin" />
-            <MapPin v-else class="size-5 mr-2" />
+            <Loader2 v-if="loadingLocation" class="size-5 mr-2 animate-spin" aria-role="status" />
+            <MapPin v-else class="size-5 mr-2" aria-hidden="true" />
             Locatie ophalen
           </Button>
 
-          <p v-if="locationError" class="text-red-500 text-sm">{{ locationError }}</p>
+          <p v-if="locationError && !selectedTrack" class="block text-red-500 text-sm mb-2">{{ locationError }}</p>
 
-          <Select v-if="filteredTracks" v-model="selectedTrack">
+          <Select v-if="filteredTracks" v-model="selectedTrack" aria-label="Selecteer een baan">
             <SelectTrigger ref="trackSelect">
               <SelectValue placeholder="Handmatig selecteren" />
             </SelectTrigger>
             <SelectContent>
-              <SelectGroup>
+              <SelectGroup v-if="favoriteTracks">
                 <SelectLabel>
                   <div class="flex items-center -ml-6">
                     <Star class="text-yellow-500 fill-yellow-500 size-4 mr-2"/>
@@ -181,10 +182,9 @@ const handleSubmit = () => {
                 </SelectItem>
               </SelectGroup>
               <SelectGroup>
-                <SelectLabel>Andere banen</SelectLabel>
+                <SelectLabel v-if="favoriteTracks">Overige banen</SelectLabel>
                 <SelectItem v-for="track in filteredTracks" :value="track.id.toString()">
                   {{track.name }}
-
                   <span :class="{'text-muted-foreground': track.name}" v-if="track.location">
                     <template v-if="track.name">
                     -

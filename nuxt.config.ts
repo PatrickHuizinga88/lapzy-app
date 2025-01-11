@@ -30,19 +30,48 @@ export default defineNuxtConfig({
   ],
 
   runtimeConfig:{
-    baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+    public: {
+      baseUrl: 'http://localhost:3000',
+    }
   },
 
   modules: [
     '@nuxtjs/tailwindcss',
-    'shadcn-nuxt',
+    '@pinia/nuxt',
     '@nuxtjs/supabase',
+    'shadcn-nuxt',
+    '@nuxtjs/i18n',
     'dayjs-nuxt',
     '@vueuse/nuxt',
   ],
 
   supabase: {
-    redirect: false
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm',
+      exclude: [
+        '/register',
+        '/password-recovery',
+        '/update-password',
+      ],
+    }
+  },
+
+  i18n: {
+    strategy: 'no_prefix',
+    defaultLocale: 'nl',
+    locales: [
+      {
+        code: 'nl',
+        name: 'Nederlands',
+        files: ['nl/common', 'nl/authentication', 'nl/dashboard']
+      },
+      {
+        code: 'en',
+        name: 'English',
+        files: ['en/common', 'en/authentication', 'en/dashboard']
+      },
+    ],
   },
 
   shadcn: {

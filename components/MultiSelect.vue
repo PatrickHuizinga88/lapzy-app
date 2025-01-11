@@ -61,12 +61,15 @@ const emit = defineEmits(['itemToggled'])
         <template v-if="selectedValues.length > 0">
           <div class="flex justify-between items-center w-full">
             <div class="flex flex-wrap gap-2 items-center">
-              <Badge v-for="value in selectedValues" variant="outline">
-                {{ getOptionByValue(value).label }}
+              <Badge variant="outline">
+                {{ getOptionByValue(selectedValues[0]).label }}
                 <XCircle
                     class="ml-2 h-4 w-4 cursor-pointer"
-                    @click.stop="toggleOption(value)"
+                    @click.stop="toggleOption(selectedValues[0])"
                 />
+              </Badge>
+              <Badge v-if="selectedValues.length > 1" variant="secondary">
+                +{{ selectedValues.length - 1 }}
               </Badge>
             </div>
             <div class="flex items-center justify-between">
@@ -81,8 +84,8 @@ const emit = defineEmits(['itemToggled'])
         </template>
         <template v-else>
           <div class="flex items-center justify-between w-full mx-auto">
-            <span class="text-sm text-muted-foreground mx-3">{{ placeholder }}</span>
-            <ChevronDown class="h-4 cursor-pointer text-muted-foreground mx-2" />
+            <span class="text-sm text-muted-foreground mx-3 truncate">{{ placeholder }}</span>
+            <ChevronDown class="h-4 cursor-pointer text-muted-foreground mx-2 shrink-0" />
           </div>
         </template>
       </Button>

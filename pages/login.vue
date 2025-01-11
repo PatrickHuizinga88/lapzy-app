@@ -23,7 +23,7 @@ const loading = ref(false)
 const signIn = async () => {
   try {
     loading.value = true
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email:    form.email,
       password: form.password
     })
@@ -31,7 +31,10 @@ const signIn = async () => {
       loading.value = false
       throw error
     }
-    navigateTo('/')
+    if (data.user.last_sign_in_at) {
+      navigateTo('/')
+    }
+    navigateTo('/intro')
   } catch (error) {
     errorMessage.value = 'Inloggen mislukt'
   }

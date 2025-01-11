@@ -21,7 +21,7 @@ const form = reactive({
 const errorMessage = ref('')
 const loading = ref(false)
 const success = ref(false)
-const {baseUrl}: { baseUrl: string } = useRuntimeConfig()
+const {public: {baseUrl}} = useRuntimeConfig()
 
 const signUp = async () => {
   if (form.password !== form.repeatedPassword) {
@@ -34,17 +34,13 @@ const signUp = async () => {
     const {error} = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
-      options: {
-        emailRedirectTo: baseUrl
-      }
     })
-    if (error) {
-      loading.value = false
-      throw error
-    }
+    if (error) throw error
     success.value = true
   } catch (error) {
     errorMessage.value = 'Er ging iets fout. Probeer het later opnieuw.'
+  } finally {
+    loading.value = false
   }
 }
 </script>
