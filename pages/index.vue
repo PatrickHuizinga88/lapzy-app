@@ -90,7 +90,7 @@ const {data: profile} = await useLazyAsyncData('profile', async () => {
     <section>
       <div class="flex items-center justify-between mb-2">
         <h2 class="font-semibold">Recente sessies</h2>
-        <Button variant="ghost" size="sm" class="-mr-3" as-child>
+        <Button v-if="recentSessions && recentSessions.length" variant="ghost" size="sm" class="-mr-3" as-child>
           <NuxtLink to="/sessions">
             Alles bekijken
           </NuxtLink>

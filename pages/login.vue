@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Loader2 } from "lucide-vue-next";
+import {Loader2} from "lucide-vue-next";
 import {Input} from "~/components/ui/input";
+import {PasswordInput} from "~/components/ui/password-input";
 
 definePageMeta({
   layout: 'auth'
@@ -23,8 +24,8 @@ const loading = ref(false)
 const signIn = async () => {
   try {
     loading.value = true
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email:    form.email,
+    const {data, error} = await supabase.auth.signInWithPassword({
+      email: form.email,
       password: form.password
     })
     if (error) {
@@ -47,31 +48,26 @@ const signIn = async () => {
       <form class="space-y-6" @submit.prevent="signIn">
         <div>
           <Label for="email">E-mailadres</Label>
-          <div class="mt-2">
-            <Input
-                v-model="form.email"
-                id="email"
-                name="email"
-                type="email"
-                required />
-          </div>
+          <Input
+              v-model="form.email"
+              id="email"
+              name="email"
+              type="email"
+              required/>
         </div>
 
         <div>
           <div class="flex items-center justify-between">
             <Label for="password">Wachtwoord</Label>
-<!--            <Button variant="link" size="sm" class="h-auto p-0" as-child>-->
-<!--              <NuxtLink to="#">Wachtwoord vergeten?</NuxtLink>-->
-<!--            </Button>-->
+            <Button variant="link" size="sm" class="h-auto p-0 mb-2" as-child>
+              <NuxtLink to="/password-recovery">Wachtwoord vergeten?</NuxtLink>
+            </Button>
           </div>
-          <div class="mt-2">
-            <Input
-                v-model="form.password"
-                id="password"
-                name="password"
-                type="password"
-                required />
-          </div>
+          <PasswordInput
+              v-model="form.password"
+              id="password"
+              name="password"
+              required/>
         </div>
 
         <div>
@@ -93,7 +89,7 @@ const signIn = async () => {
       Heb je geen account?
       {{ ' ' }}
       <Button variant="link" size="sm" class="px-0" as-child>
-        <NuxtLink to="/register">Meld je aan</NuxtLink>
+        <NuxtLink to="/register">Registreer nu</NuxtLink>
       </Button>
     </p>
   </div>

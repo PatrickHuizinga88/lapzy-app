@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {Loader2} from "lucide-vue-next";
 import {Input} from "~/components/ui/input";
+import {PasswordInput} from "~/components/ui/password-input";
 
 definePageMeta({
   layout: 'auth'
@@ -61,21 +62,19 @@ const signUp = async () => {
 
         <div>
           <Label for="password">Wachtwoord</Label>
-          <Input
+          <PasswordInput
               v-model="form.password"
               id="password"
               name="password"
-              type="password"
               required/>
         </div>
 
         <div>
           <Label for="repeat-password">Herhaal je wachtwoord</Label>
-          <Input
+          <PasswordInput
               v-model="form.repeatedPassword"
               id="repeat-password"
-              name="password"
-              type="password"
+              name="repeat-password"
               required/>
         </div>
 

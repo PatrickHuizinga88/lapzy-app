@@ -163,7 +163,7 @@ const handleSubmit = () => {
               <SelectValue placeholder="Handmatig selecteren" />
             </SelectTrigger>
             <SelectContent>
-              <SelectGroup v-if="favoriteTracks">
+              <SelectGroup v-if="favoriteTracks && favoriteTracks.length">
                 <SelectLabel>
                   <div class="flex items-center -ml-6">
                     <Star class="text-yellow-500 fill-yellow-500 size-4 mr-2"/>
@@ -172,7 +172,6 @@ const handleSubmit = () => {
                 </SelectLabel>
                 <SelectItem v-for="track in favoriteTracks" :value="track.id.toString()">
                   {{track.name }}
-
                   <span :class="{'text-muted-foreground': track.name}" v-if="track.location">
                     <template v-if="track.name">
                     -
@@ -182,7 +181,7 @@ const handleSubmit = () => {
                 </SelectItem>
               </SelectGroup>
               <SelectGroup>
-                <SelectLabel v-if="favoriteTracks">Overige banen</SelectLabel>
+                <SelectLabel v-if="favoriteTracks && favoriteTracks.length">Overige banen</SelectLabel>
                 <SelectItem v-for="track in filteredTracks" :value="track.id.toString()">
                   {{track.name }}
                   <span :class="{'text-muted-foreground': track.name}" v-if="track.location">
