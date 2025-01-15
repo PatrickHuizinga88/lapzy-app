@@ -54,7 +54,16 @@ export default {
           description: "Het verwijderen van {item} is mislukt."
         },
       },
-
+      update: {
+        success: {
+          title: "Update geslaagd",
+          description: "{item} is succesvol bijgewerkt."
+        },
+        error: {
+          title: "Update mislukt",
+          description: "Het bijwerken van {item} is mislukt."
+        },
+      },
       error: {
         title: "Er is iets misgegaan",
         description: "Probeer het later opnieuw of neem contact met ons op.",

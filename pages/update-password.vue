@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {ref} from 'vue'
 import {Loader2} from 'lucide-vue-next'
 import {useI18n} from 'vue-i18n'
 import {PasswordInput} from "~/components/ui/password-input";
@@ -31,6 +30,10 @@ const updatePassword = async () => {
     })
 
     if (error) {
+      if (error.code === 'same_password') {
+        errorMessage.value = t('authentication.password_recovery.same_password')
+        return
+      }
       notificationStore.createNotification({
         type: 'destructive',
         isError: true,
@@ -58,15 +61,9 @@ const updatePassword = async () => {
 </script>
 
 <template>
-  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-    <img src="~/assets/images/logo.svg" alt="Logo" class="mx-auto h-12 w-auto">
-    <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
-      {{ t('authentication.password_recovery.reset_your_password') }}</h2>
-  </div>
-
   <NuxtLayout name="auth" :title="$t('authentication.password_recovery.reset_your_password')">
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-      <div class="bg-background border px-6 py-12 shadow-[0_10px_50px_-15px] shadow-primary/25 sm:rounded-xl sm:px-12">
+    <div class="sm:mt-6 md:mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+      <div class="bg-background border px-6 py-10 shadow-[0_10px_50px_-15px] shadow-primary/25 sm:rounded-xl sm:px-10">
         <form class="space-y-6" @submit.prevent="updatePassword">
           <div>
             <Label for="new-password" class="block text-sm font-medium leading-6">{{

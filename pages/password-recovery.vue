@@ -43,9 +43,9 @@ const resetPassword = async () => {
 </script>
 
 <template>
-  <NuxtLayout name="auth" :title="$t('authentication.password_recovery.reset_your_password')" description="Vul je e-mailadres in om een herstellink te ontvangen.">
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-      <div class="bg-background px-6 py-12 sm:shadow-xl sm:rounded-xl sm:px-12">
+  <NuxtLayout name="auth" :title="$t('authentication.password_recovery.reset_your_password')" description="Vul het e-mailadres in van je Lapzy account om het wachtwoord te herstellen.">
+    <div class="sm:mt-6 md:mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+      <div class="bg-background px-6 py-10 sm:shadow-xl sm:rounded-xl sm:px-10">
         <form v-if="!success" class="space-y-6" @submit.prevent="resetPassword">
           <div>
             <Label for="email" class="block text-sm font-medium leading-6">{{ $t('common.general.email') }}</Label>
@@ -73,7 +73,7 @@ const resetPassword = async () => {
         </p>
       </div>
 
-      <div class="flex justify-center mt-10">
+      <div class="flex justify-center sm:mt-6 md:mt-10">
         <Button variant="link" class="p-0" as-child>
           <NuxtLink to="/login">
             {{ $t('authentication.password_recovery.back_to_sign_in') }}

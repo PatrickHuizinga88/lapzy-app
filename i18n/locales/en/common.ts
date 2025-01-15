@@ -54,7 +54,16 @@ export default {
           description: "Failed to delete {item}."
         },
       },
-
+      update: {
+        success: {
+          title: "Update successful",
+          description: "{item} was updated successfully."
+        },
+        error: {
+          title: "Update Failed",
+          description: "Failed to update {item}."
+        },
+      },
       error: {
         title: "Something went wrong",
         description: "Try again later or contact us.",

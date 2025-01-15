@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {Loader2} from "lucide-vue-next";
+import {Loader2, CheckCircle} from "lucide-vue-next";
 import {Input} from "~/components/ui/input";
 import {PasswordInput} from "~/components/ui/password-input";
+import {Alert, AlertDescription, AlertTitle} from "~/components/ui/alert";
 
 definePageMeta({
-  layout: 'auth'
+  layout: false
 })
 
 useSeoMeta({
@@ -35,6 +36,9 @@ const signUp = async () => {
     const {error} = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
+      options: {
+        emailRedirectTo: `${baseUrl}/confirm-registration`
+      }
     })
     if (error) throw error
     success.value = true
@@ -47,63 +51,66 @@ const signUp = async () => {
 </script>
 
 <template>
-  <div class="mt-10 sm:mx-auto w-full sm:max-w-[480px]">
-    <div class="bg-background px-6 py-12 sm:shadow-xl sm:rounded-xl sm:px-12">
-      <form v-if="!success" class="space-y-6" @submit.prevent="signUp">
-        <div>
-          <Label for="email">E-mailadres</Label>
-          <Input
-              v-model="form.email"
-              id="email"
-              name="email"
-              type="email"
-              required/>
-        </div>
+  <NuxtLayout name="auth" :title="$t('authentication.register.sign_up')" description="Begin jouw avontuur naar betere prestaties.">
+    <div class="sm:mt-6 md:mt-10 sm:mx-auto w-full sm:max-w-[480px]">
+      <div class="bg-background px-6 py-10 sm:shadow-xl sm:rounded-xl sm:px-10">
+        <form v-if="!success" class="space-y-6" @submit.prevent="signUp">
+          <div>
+            <Label for="email">E-mailadres</Label>
+            <Input
+                v-model="form.email"
+                id="email"
+                name="email"
+                type="email"
+                required/>
+          </div>
 
-        <div>
-          <Label for="password">Wachtwoord</Label>
-          <PasswordInput
-              v-model="form.password"
-              id="password"
-              name="password"
-              required/>
-        </div>
+          <div>
+            <Label for="password">Wachtwoord</Label>
+            <PasswordInput
+                v-model="form.password"
+                id="password"
+                name="password"
+                required/>
+          </div>
 
-        <div>
-          <Label for="repeat-password">Herhaal je wachtwoord</Label>
-          <PasswordInput
-              v-model="form.repeatedPassword"
-              id="repeat-password"
-              name="repeat-password"
-              required/>
-        </div>
+          <div>
+            <Label for="repeat-password">Herhaal je wachtwoord</Label>
+            <PasswordInput
+                v-model="form.repeatedPassword"
+                id="repeat-password"
+                name="repeat-password"
+                required/>
+          </div>
 
-        <div>
-          <Button type="submit" :disabled="loading" class="w-full">
-            <div v-if="loading" role="status" class="mr-2">
-              <Loader2 class="size-5 animate-spin"/>
-              <span class="sr-only">Aan het laden...</span>
-            </div>
-            Registreren
-          </Button>
-        </div>
+          <div>
+            <Button type="submit" :disabled="loading" class="w-full">
+              <div v-if="loading" role="status" class="mr-2">
+                <Loader2 class="size-5 animate-spin"/>
+                <span class="sr-only">Aan het laden...</span>
+              </div>
+              Registreren
+            </Button>
+          </div>
 
-        <p class="text-sm text-destructive">{{ errorMessage }}</p>
+          <p v-if="errorMessage" class="text-sm text-destructive">{{ errorMessage }}</p>
 
-      </form>
+        </form>
 
-      <div v-else>
-        <p class="text-center text-lg font-semibold">Registratie gelukt!</p>
-        <p class="text-center text-muted-foreground">Je ontvangt een e-mail om je account te activeren.</p>
+        <Alert v-else variant="success">
+          <CheckCircle class="size-4"/>
+          <AlertTitle>Registratie gelukt!</AlertTitle>
+          <AlertDescription>Je ontvangt een e-mail om je account te activeren.</AlertDescription>
+        </Alert>
       </div>
-    </div>
 
-    <p class="mt-10 text-center text-sm text-muted-foreground">
-      Heb je al een account?
-      {{ ' ' }}
-      <Button variant="link" size="sm" class="px-0" as-child>
-        <NuxtLink to="/login">Log in</NuxtLink>
-      </Button>
-    </p>
-  </div>
+      <p class="sm:mt-6 md:mt-10 text-center text-sm text-muted-foreground">
+        Heb je al een account?
+        {{ ' ' }}
+        <Button variant="link" size="sm" class="px-0" as-child>
+          <NuxtLink to="/login">Log in</NuxtLink>
+        </Button>
+      </p>
+    </div>
+  </NuxtLayout>
 </template>

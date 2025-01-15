@@ -75,7 +75,7 @@ const saveSession = async (laps: Lap[], duration: string, note: string) => {
   <div class="flex flex-col h-full">
     <section v-if="track" class="flex flex-col items-center justify-center text-center h-32 shrink-0 space-y-1">
       <h1 v-if="trackStatus !== 'pending'" class="text-2xl">{{ track?.name || track?.location }}</h1>
-      <Skeleton v-if="trackStatus === 'pending'" class="h-8 w-40" />
+      <Skeleton v-else class="h-8 w-40" />
 <!--      <div v-if="fastestLap" class="flex items-center justify-center gap-x-2 text-muted-foreground text-lg">-->
 <!--        <Trophy class="size-5"/>-->
 <!--        {{ fastestLap }}-->

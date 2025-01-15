@@ -10,10 +10,10 @@ const notificationStore = useNotificationStore()
 const open = ref(false)
 const newLocation = ref('')
 
-const { data: profile } = await useAsyncData('profile', async () => {
+const {data: profile} = await useAsyncData('profile', async () => {
   if (!user.value) return
   try {
-    const { data, error } = await supabase
+    const {data, error} = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.value.id)
@@ -63,16 +63,17 @@ const leave = () => {
 </script>
 
 <template>
-  <NuxtLoadingIndicator color="hsl(var(--primary))" />
+  <NuxtLoadingIndicator color="hsl(var(--primary))"/>
   <ClientOnly>
-    <ThemeProvider :theme="profile?.theme" />
+    <ThemeProvider :theme="profile?.theme"/>
   </ClientOnly>
-  <header class="sticky top-0 left-0 flex justify-between items-center h-[var(--header-height)] bg-background border-b border-border">
+  <header
+      class="sticky top-0 left-0 flex justify-between items-center h-[var(--header-height)] bg-background border-b border-border">
     <div class="container">
       <div class="flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center">
           <ClientOnly>
-            <Logo />
+            <Logo/>
             <template #fallback class="h-6 w-6 mr-1 bg-primary rounded-full">
               <img src="../assets/images/logo.svg" alt="Logo" class="h-6 mr-1"/>
             </template>
@@ -93,12 +94,12 @@ const leave = () => {
           <DropdownMenuContent :align-offset="10">
             <DropdownMenuItem as-child>
               <NuxtLink to="/profile">
-                <User class="mr-2 size-4" />
+                <User class="mr-2 size-4"/>
                 Mijn profiel
               </NuxtLink>
             </DropdownMenuItem>
             <DropdownMenuItem @click="logOut">
-              <LogOut class="mr-2 size-4" />
+              <LogOut class="mr-2 size-4"/>
               Uitloggen
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -107,7 +108,7 @@ const leave = () => {
     </div>
   </header>
   <main class="flex flex-col h-[calc(100svh-var(--header-height))]">
-    <div class="flex-1 overflow-auto py-6">
+    <div class="flex-1 overflow-y-auto py-6">
       <div class="container">
         <slot/>
       </div>
@@ -124,16 +125,18 @@ const leave = () => {
           Home
         </component>
         <SessionDialog>
-          <button :class="[{'!opacity-100 font-semibold' : currentPath === '/timer'}, 'inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50']" :disabled="currentPath === '/timer'">
+          <button
+              :class="[{'!opacity-100 font-semibold' : currentPath === '/timer'}, 'inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50']"
+              :disabled="currentPath === '/timer'">
             <Timer class="size-5"/>
             Stopwatch
           </button>
         </SessionDialog>
         <component :is="componentToShow"
                    @click="currentPath === '/timer' && confirmNavigation('/sessions')"
-            :to="currentPath === '/timer' ? undefined : '/sessions'"
-            class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
-            activeClass="!opacity-100 font-semibold"
+                   :to="currentPath === '/timer' ? undefined : '/sessions'"
+                   class="inline-flex flex-col items-center justify-center gap-y-1 px-5 opacity-50"
+                   activeClass="!opacity-100 font-semibold"
         >
           <Calendar class="size-5"/>
           Sessies
@@ -153,7 +156,7 @@ const leave = () => {
     </DialogContent>
   </Dialog>
 
-  <NotificationList :notifications="notificationStore.notifications" />
+  <NotificationList :notifications="notificationStore.notifications"/>
 
 </template>
 

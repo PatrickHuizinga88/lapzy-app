@@ -30,6 +30,7 @@ export default {
       password_update_success: "Password has been updated",
       reset_password: "Reset password",
       reset_your_password: "Reset your password",
+      same_password: "Password must be different from the current password",
       sign_in_with_new_password: "You can now sign in with your new password",
       update_password: "Update password",
     }
