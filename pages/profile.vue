@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {Database} from "~/types/supabase";
-import {Loader2} from "lucide-vue-next";
+import {Loader2, Info} from "lucide-vue-next";
 
 useSeoMeta({
   title: 'Profiel - Lapzy',
@@ -12,6 +12,11 @@ const user = useSupabaseUser()
 const notificationStore = useNotificationStore()
 
 const loading = ref(false)
+const loadingPassword = ref(false)
+const emailChangeMessage = ref('')
+const passwordChangeMessage = ref('')
+
+const open = ref(false)
 
 const {data: profile} = await useAsyncData('profile', async () => {
   try {
@@ -63,6 +68,10 @@ const form = reactive({
   rider_number: profile.value?.rider_number || '',
   theme: profile.value?.theme || '220 76% 49%',
   favoriteTracks: favoriteTracks.value || [],
+  email: user.value?.email || '',
+  currentPassword: '',
+  newPassword: '',
+  repeatedPassword: '',
 })
 
 const themes = [
@@ -120,6 +129,15 @@ const onSubmit = async () => {
           track_id: form.favoriteTracks,
         }, {onConflict: 'profile_id'})
     if (favoriteTracksError) throw favoriteTracksError
+
+    if (user.value.email !== form.email) {
+      const {error: userError} = await supabase.auth.updateUser({
+        email: form.email,
+      })
+      if (userError) throw userError
+      emailChangeMessage.value = 'Er is een e-mail verstuurd naar je nieuwe e-mailadres om deze te bevestigen.'
+    }
+
     applyTheme(form.theme)
     notificationStore.createNotification({
       type: 'success',
@@ -131,16 +149,59 @@ const onSubmit = async () => {
     notificationStore.createNotification({
       type: 'destructive',
       action: 'save',
-      item: 'Profiel',
+      item: 'profiel',
     })
   } finally {
     loading.value = false
   }
 }
+
+const onPasswordSubmit = async () => {
+  try {
+    loadingPassword.value = true
+    if (form.newPassword !== form.repeatedPassword) {
+      passwordChangeMessage.value = 'De nieuwe wachtwoorden komen niet overeen.'
+      return
+    }
+    const {data, error: verificationError} = await supabase.rpc('verify_password', {
+      current_plain_password: form.currentPassword,
+      current_id: user.value?.id
+    })
+    if (data === 'incorrect') {
+      passwordChangeMessage.value = 'Het huidige wachtwoord is onjuist.'
+      return
+    }
+    if (verificationError) throw verificationError
+    const {error: updateError} = await supabase.auth.updateUser({
+      password: form.newPassword,
+    })
+    if (updateError) throw updateError
+    passwordChangeMessage.value = ''
+    open.value = false
+    notificationStore.createNotification({
+      type: 'success',
+      action: 'save',
+      item: 'Wachtwoord',
+    })
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loadingPassword.value = false
+  }
+}
+
+// Watch for changes on form.email
+watch(form, () => {
+  if (form.email !== user.value?.email) {
+    emailChangeMessage.value = 'Er wordt een e-mail verstuurd naar je nieuwe e-mailadres om deze te bevestigen.'
+  } else {
+    emailChangeMessage.value = ''
+  }
+}, {deep: true})
 </script>
 
 <template>
-  <h1 class="text-2xl font-bold mb-8">Mijn profiel</h1>
+  <h1 class="text-2xl sm:text-3xl font-semibold mb-8">Mijn profiel</h1>
   <form @submit.prevent="onSubmit" class="space-y-8">
     <section id="profile-settings" class="space-y-6">
       <div class="grid grid-cols-2 gap-4">
@@ -195,6 +256,76 @@ const onSubmit = async () => {
                 :for="theme.value"
                 :class="cn('inline-flex items-center justify-center size-8 border border-input rounded-full cursor-pointer peer-checked:outline-none peer-checked:ring-2 peer-checked:ring-ring peer-checked:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50', themeBackground(theme.value))"
             ></Label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="account-settings">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <Label for="email">E-mailadres</Label>
+          <Input
+              v-model="form.email"
+              id="email"
+              name="email"
+              type="email"
+          />
+          <Alert v-if="emailChangeMessage" variant="info" class="mt-4">
+            <Info class="size-4"/>
+            <AlertDescription>{{ emailChangeMessage }}</AlertDescription>
+          </Alert>
+        </div>
+        <div>
+          <Label for="password">Wachtwoord</Label><br/>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="password" id="password" value="fake-password" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" disabled/>
+            <Dialog v-model:open="open">
+              <DialogTrigger as-child>
+                <Button variant="outline">Wachtwoord wijzigen</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader class="text-left">
+                  <DialogTitle>Wachtwoord wijzigen</DialogTitle>
+                </DialogHeader>
+                <form @submit.prevent="onPasswordSubmit" class="space-y-4">
+                  <div>
+                    <Label for="current-password">Huidig wachtwoord</Label>
+                    <PasswordInput
+                        v-model="form.currentPassword"
+                        id="current-password"
+                        name="current-password"
+                        required
+                    />
+                  </div>
+                  <div>
+                    <Label for="new-password">Nieuw wachtwoord</Label>
+                    <PasswordInput
+                        v-model="form.newPassword"
+                        id="new-password"
+                        name="new-password"
+                        required
+                    />
+                  </div>
+                  <div>
+                    <Label for="repeated-password">Herhaal nieuw wachtwoord</Label>
+                    <PasswordInput
+                        v-model="form.repeatedPassword"
+                        id="repeated-password"
+                        name="repeated-password"
+                        required
+                    />
+                  </div>
+
+                  <p v-if="passwordChangeMessage" class="text-sm text-destructive">{{ passwordChangeMessage }}</p>
+
+                  <Button class="w-full">
+                    Opslaan
+                  </Button>
+                </form>
+
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>

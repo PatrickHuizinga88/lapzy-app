@@ -2,10 +2,6 @@
 import type {Database} from "~/types/supabase";
 import {Loader2} from 'lucide-vue-next'
 
-definePageMeta({
-  middleware: 'is-new-user'
-})
-
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 

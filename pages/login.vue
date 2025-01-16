@@ -4,7 +4,8 @@ import {Input} from "~/components/ui/input";
 import {PasswordInput} from "~/components/ui/password-input";
 
 definePageMeta({
-  layout: false
+  layout: false,
+  middleware: 'is-authenticated'
 })
 
 useSeoMeta({
@@ -13,6 +14,7 @@ useSeoMeta({
 })
 
 const supabase = useSupabaseClient()
+const {t} = useI18n()
 
 const form = reactive({
   email: '',
@@ -34,10 +36,12 @@ const signIn = async () => {
     }
     if (data.user.last_sign_in_at) {
       navigateTo('/')
+      return
     }
     navigateTo('/intro')
   } catch (error) {
-    errorMessage.value = 'Inloggen mislukt'
+    errorMessage.value = t('authentication.login.sign_in_failed')
+    console.error(error)
   }
 }
 </script>

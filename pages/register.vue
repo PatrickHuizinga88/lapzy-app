@@ -5,7 +5,8 @@ import {PasswordInput} from "~/components/ui/password-input";
 import {Alert, AlertDescription, AlertTitle} from "~/components/ui/alert";
 
 definePageMeta({
-  layout: false
+  layout: false,
+  middleware: 'is-authenticated'
 })
 
 useSeoMeta({
@@ -14,6 +15,7 @@ useSeoMeta({
 })
 
 const supabase = useSupabaseClient()
+const {t} = useI18n()
 
 const form = reactive({
   email: '',
@@ -43,7 +45,8 @@ const signUp = async () => {
     if (error) throw error
     success.value = true
   } catch (error) {
-    errorMessage.value = 'Er ging iets fout. Probeer het later opnieuw.'
+    errorMessage.value = t('authentication.register.sign_up_failed')
+    console.error(error)
   } finally {
     loading.value = false
   }
@@ -97,11 +100,18 @@ const signUp = async () => {
 
         </form>
 
-        <Alert v-else variant="success">
-          <CheckCircle class="size-4"/>
-          <AlertTitle>Registratie gelukt!</AlertTitle>
-          <AlertDescription>Je ontvangt een e-mail om je account te activeren.</AlertDescription>
-        </Alert>
+        <div v-else class="flex flex-col items-center">
+          <Alert variant="success">
+            <CheckCircle class="size-4"/>
+            <AlertTitle>Registratie gelukt!</AlertTitle>
+            <AlertDescription>Je ontvangt een e-mail om je account te activeren.</AlertDescription>
+          </Alert>
+
+          <p class="text-sm text-muted-foreground mt-4">
+            Niks ontvangen?
+            <Button @click="signUp" variant="link" class="h-auto p-0 text-primary">Verstuur opnieuw</Button>
+          </p>
+        </div>
       </div>
 
       <p class="sm:mt-6 md:mt-10 text-center text-sm text-muted-foreground">

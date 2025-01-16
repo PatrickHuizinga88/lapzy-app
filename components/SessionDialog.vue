@@ -129,7 +129,7 @@ const handleSubmit = () => {
     <DialogTrigger as-child>
       <slot />
     </DialogTrigger>
-    <DialogContent aria-describedby="Stel de baan en status van de sessie in.">
+    <DialogContent>
       <DialogTitle>
         <h3 class="text-lg font-semibold">Sessie instellen</h3>
       </DialogTitle>

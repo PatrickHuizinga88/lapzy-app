@@ -2,12 +2,9 @@
 import type {Database} from "~/types/supabase";
 import { ArrowLeft } from 'lucide-vue-next';
 
-definePageMeta({
-  middleware: 'auth'
-})
-
 const { id } = useRoute().params
 const supabase = useSupabaseClient<Database>()
+const notificationStore = useNotificationStore()
 
 const {data: session} = await useAsyncData('session', async () => {
   try {
@@ -35,6 +32,11 @@ const {data: session} = await useAsyncData('session', async () => {
       laps
     }
   } catch (error) {
+    notificationStore.createNotification({
+      type: 'destructive',
+      action: 'retrieve',
+      item: 'sessie'
+    })
     console.error(error)
   }
 })

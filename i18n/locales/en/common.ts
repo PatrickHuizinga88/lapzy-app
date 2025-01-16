@@ -64,6 +64,16 @@ export default {
           description: "Failed to update {item}."
         },
       },
+      retrieve: {
+        success: {
+          title: "Retrieve successful",
+          description: "{item} was retrieved successfully."
+        },
+        error: {
+          title: "Retrieve Failed",
+          description: "Failed to retrieve {item}."
+        },
+      },
       error: {
         title: "Something went wrong",
         description: "Try again later or contact us.",

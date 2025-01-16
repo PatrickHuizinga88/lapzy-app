@@ -53,6 +53,7 @@ export default defineNuxtConfig({
         '/register',
         '/password-recovery',
         '/update-password',
+        '/confirm-registration'
       ],
     }
   },

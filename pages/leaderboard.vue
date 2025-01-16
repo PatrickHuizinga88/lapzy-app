@@ -6,10 +6,6 @@ useSeoMeta({
   description: 'Vergelijk jouw rondetijden met die van anderen.'
 })
 
-definePageMeta({
-  middleware: 'auth'
-})
-
 const supabase = useSupabaseClient<Database>()
 
 const { data: tracks, status } = await useLazyAsyncData('tracks', async () => {

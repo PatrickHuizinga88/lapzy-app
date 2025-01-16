@@ -13,8 +13,8 @@ const notificationStore = useNotificationStore()
   <div class="min-h-svh flex flex-col justify-center sm:bg-muted py-12 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm text-center">
       <img src="~/assets/images/logo.svg" alt="Logo" class="mx-auto h-12 w-auto">
-      <h2 class="mt-10 text-3xl font-bold leading-9 tracking-tight mb-2">{{ title }}</h2>
-      <p v-if="description" class="text-muted-foreground">{{ description }}</p>
+      <h2 class="mt-10 text-3xl font-bold leading-9 tracking-tight`text-center mb-2">{{ title }}</h2>
+      <p v-if="description" class="text-muted-foreground`text-center">{{ description }}</p>
     </div>
 
     <slot/>

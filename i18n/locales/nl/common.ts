@@ -64,6 +64,16 @@ export default {
           description: "Het bijwerken van {item} is mislukt."
         },
       },
+      retrieve: {
+        success: {
+          title: "Ophalen geslaagd",
+          description: "{item} is succesvol opgehaald."
+        },
+        error: {
+          title: "Ophalen mislukt",
+          description: "Het ophalen van {item} is mislukt."
+        },
+      },
       error: {
         title: "Er is iets misgegaan",
         description: "Probeer het later opnieuw of neem contact met ons op.",

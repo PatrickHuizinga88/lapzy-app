@@ -4,7 +4,8 @@ import {useI18n} from 'vue-i18n'
 import {PasswordInput} from "~/components/ui/password-input";
 
 definePageMeta({
-  layout: false
+  layout: false,
+  middleware: 'is-authenticated'
 })
 
 const supabase = useSupabaseClient()

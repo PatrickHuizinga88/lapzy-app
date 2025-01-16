@@ -10,10 +10,6 @@ useSeoMeta({
   description: 'Leg jouw rondetijden eenvoudig vast.'
 })
 
-definePageMeta({
-  middleware: 'auth'
-})
-
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 const notificationStore = useNotificationStore()

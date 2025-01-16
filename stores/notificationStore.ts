@@ -11,7 +11,7 @@ type Notification = {
 
 type NotificationProps =
   | { type: 'success' | 'destructive', isError: true }
-  | { type: 'success' | 'destructive', isError?: false, action: 'save' | 'update' | 'delete', item: string }
+  | { type: 'success' | 'destructive', isError?: false, action: 'save' | 'update' | 'delete' | 'retrieve', item: string }
 
 export const useNotificationStore = defineStore('notificationStore', {
   state: () => ({
@@ -36,6 +36,10 @@ export const useNotificationStore = defineStore('notificationStore', {
           delete: {
             success: `common.notifications.delete.success.${text}`,
             destructive: `common.notifications.delete.error.${text}`
+          },
+          retrieve: {
+            success: `common.notifications.retrieve.success.${text}`,
+            destructive: `common.notifications.retrieve.error.${text}`
           }
         }
 

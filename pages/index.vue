@@ -9,10 +9,6 @@ useSeoMeta({
   description: 'Overzicht van jouw laatste activiteit.'
 })
 
-definePageMeta({
-  middleware: 'auth'
-})
-
 const user = useSupabaseUser()
 const supabase = useSupabaseClient<Database>()
 

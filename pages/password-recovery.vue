@@ -2,7 +2,8 @@
 import {Loader2} from 'lucide-vue-next'
 
 definePageMeta({
-  layout: false
+  layout: false,
+  middleware: 'is-authenticated'
 })
 
 const supabase = useSupabaseClient()
