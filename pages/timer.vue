@@ -5,6 +5,10 @@ import Timer from "~/components/Timer.vue";
 import type {Lap} from "~/types";
 import { useWakeLock } from '@vueuse/core'
 
+definePageMeta({
+  layout: 'timer'
+})
+
 useSeoMeta({
   title: 'Stopwatch - Lapzy',
   description: 'Leg jouw rondetijden eenvoudig vast.'
@@ -34,6 +38,8 @@ const { data: track, status: trackStatus } = await useAsyncData('track', async (
 })
 
 const saveSession = async (laps: Lap[], duration: string, note: string) => {
+  if (!user.value) return
+
   try {
     const { data: session, error: sessionError } = await supabase.from('sessions').insert({
       track_id: parseInt(track_id),

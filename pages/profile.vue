@@ -45,7 +45,7 @@ const {data: tracks} = await useLazyAsyncData('tracks', async () => {
   }))
 })
 
-const {data: favoriteTracks} = await useAsyncData('favoriteTracks', async () => {
+const {data: favoriteTracks} = await useAsyncData('profileFavoriteTracks', async () => {
   const {data: favoriteTrackIds, error: favoriteTracksError} = await supabase
       .from('favorite_tracks')
       .select('track_id')

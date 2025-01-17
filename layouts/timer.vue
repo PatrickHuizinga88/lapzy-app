@@ -12,8 +12,8 @@ const notificationStore = useNotificationStore()
   <Header />
 
   <main class="flex flex-col h-[calc(100svh-var(--header-height))]">
-    <div class="flex-1 overflow-y-auto py-6">
-      <div class="container">
+    <div class="flex-1 py-6">
+      <div class="h-full container">
         <slot/>
       </div>
     </div>

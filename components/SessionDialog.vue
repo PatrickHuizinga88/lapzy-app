@@ -7,6 +7,8 @@ const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 
 const { data: favoriteTracks } = await useAsyncData('favoriteTracks', async () => {
+  if (!user.value) return
+
   const { data: favoriteTrackIds, error: favoriteTracksError } = await supabase
       .from('favorite_tracks')
       .select('track_id')

@@ -1,7 +1,8 @@
 export default function applyTheme(theme?: string) {
   if (!theme) return
 
-  if (!localStorage.getItem('theme')) {
+  if (!localStorage.getItem('theme') ||
+    localStorage.getItem('theme') !== theme) {
     localStorage.setItem('theme', theme)
   }
 
